@@ -1,0 +1,97 @@
+* {
+    box-sizing: border-box;
+    padding: 0;
+    margin: 0;
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+/* -----------------------------------------------------------------------
+                        General Section
+--------------------------------------------------------------------------*/
+body {
+    background-color: rgb(203, 181, 224);
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+}
+header {
+    width: 100%;
+    height: 70px;
+}
+main {
+    width: 100%;
+    min-height: 500px;
+    flex-grow: 1;
+}
+footer {
+    width: 100%;
+    height: 30px;
+}
+
+/* -----------------------------------------------------------------------
+                        Petition Section
+--------------------------------------------------------------------------*/
+.petition {
+    min-height: 100px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.petition h1 {
+    margin: 10px;
+}
+
+.petition .error {
+    height: 20px;
+    width: 80%;
+    border: 1 solid black;
+    text-align: center;
+}
+
+.petition-form {
+    display: flex;
+    flex-direction: column;
+    width: 80%;
+    margin: 10px;
+}
+
+.petition-form input {
+    /* width: 80%; */
+    height: 25px;
+    border: none;
+    border-radius: 4px;
+    border-bottom: 2.5px solid rgb(164, 100, 224);
+    margin-bottom: 10px;
+}
+
+.petition-form button {
+    height: 25px;
+    width: 150px;
+    border-radius: 9px;
+    border: 1.5 solid rgb(164, 100, 224);
+}
+
+.petition-form canvas {
+    background-color: aliceblue;
+    border-radius: 10px;
+    margin-bottom: 10px;
+    cursor: pointer;
+}
+
+/* -----------------------------------------------------------------------
+                        Thanks Section
+--------------------------------------------------------------------------*/
+
+/* -----------------------------------------------------------------------
+                        Signers Section
+--------------------------------------------------------------------------*/
+.signers {
+    text-align: center;
+}
+.signers h1 {
+    margin: 10px;
+}
+.signers p {
+    margin: 5px;
+}

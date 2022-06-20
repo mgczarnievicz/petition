@@ -1,0 +1,25 @@
+<section class="petition">
+    <h1>Sign up our Petition</h1>
+
+    <div class="error">
+        {{#if error}}
+            <p>Oops! an Error has occurred. Please try again</p>
+        {{/if}}
+    </div>
+    <form class="petition-form" method="post" action="/petition">
+        <label for="name">Name</label>
+        <input id="name" type="text" name="name" required />
+
+        <label for="surname">Surname</label>
+        <input id="surname" type="text" name="surname" required />
+
+        <label for="signature">Signature</label>
+        <input id="signature" type="text" name="signature" />
+        <canvas width="250px" height="100px" id="signature-canva"></canvas>
+
+        <button type="submit">Submit</button>
+    </form>
+
+</section>
+
+<script src="/script.js"></script>
