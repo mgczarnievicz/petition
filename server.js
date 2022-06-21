@@ -11,6 +11,29 @@ const { getAllSignature, getName, addSignature } = require("./db");
 
 const bodyParser = require("body-parser");
 
+const cookieSession = require("cookie-session");
+
+app.use(
+    cookieSession({
+        /* This is use to generate the signature of the encription. 
+        When we recived the cookie, if the signature is not the same that we generate,
+        we assume that the cookie was tempted and we distructed. */
+        secret: `I'm always angry.`,
+        // How much the cookie is going to live.
+        maxAge: 1000 * 60 * 60 * 24 * 14,
+    })
+);
+
+app.get("/read-cookies", (req, res) => {
+    console.log("req.session", req.session);
+    res.sendStatus(200);
+});
+
+app.get("/add-to-cookie", (req, res) => {
+    // Session is an object.
+    req.session.cohort = "cayanne";
+});
+
 app.use(
     bodyParser.urlencoded({
         extended: true,
@@ -30,13 +53,19 @@ app.get("/petition/thanks", (req, res) => {
 
 app.get("/petition/signers", (req, res) => {
     console.log("I am in signers");
-    getName()
+    getAllSignature()
         .then((result) => {
             console.log("nameList", result.rows);
             const listOfSigners = result.rows;
             res.render("signers", { title: "Signers", listOfSigners });
         })
         .catch((err) => console.log("Error:", err));
+});
+
+app.get("/petition/logout", (req, res) => {
+    console.log("I am in Logout, we clear the cookies");
+    req.session = {};
+    res.render("thanks", { title: "Thanks" });
 });
 
 // POST in pettion is missing.
@@ -53,6 +82,6 @@ app.post("/petition", (req, res) => {
 
 app.listen(PORT, () => {
     console.log(
-        `\t Server is lisening on port ${PORT}\n\t http://localhost:${PORT}/\n`
+        `\t Server is lisening on port ${PORT}\n\t http://localhost:${PORT}/petition\n`
     );
 });
