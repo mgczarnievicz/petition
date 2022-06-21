@@ -10,13 +10,7 @@ app.set("view engine", "handlebars");
 const secrets = require("./secrets");
 const { SECRET_COOKIE_SESSION } = secrets;
 
-const {
-    getAllSignature,
-    getName,
-    addSignature,
-    getRowById,
-    countRowsInTable,
-} = require("./db");
+const { getName, addSignature, getSignerByIdAndTotalSigners } = require("./db");
 
 const bodyParser = require("body-parser");
 
@@ -60,7 +54,7 @@ app.use(express.static("./public"));
 
 // Auth function.
 app.use((req, res, next) => {
-    if (req.url != "/petition") {
+    if (req.url != "/petition" && req.url != "/petition/") {
         if (req.session.signatureId) {
             next();
         } else {
@@ -84,15 +78,11 @@ app.get("/petition", (req, res) => {
 
 app.get("/petition/thanks", (req, res) => {
     console.log("I am in thenks");
-    getRowById(req.session.signatureId).then((result) => {
-        countRowsInTable().then((countResult) => {
-            console.log("countResult:", countResult.rows[0].count);
-
-            res.render("thanks", {
-                title: "Thanks",
-                listOfSigners: result.rows,
-                totalSigners: countResult.rows[0].count,
-            });
+    getSignerByIdAndTotalSigners(req.session.signatureId).then((result) => {
+        res.render("thanks", {
+            title: "Thanks",
+            listOfSigners: result[0],
+            totalSigners: result[1].count,
         });
     });
 });

@@ -19,17 +19,29 @@ module.exports.getName = () => {
     return db.query(`SELECT first, last FROM signatures`);
 };
 
-module.exports.getRowById = (rowNum) => {
+// module.exports.getRowById = (rowNum) => {
+//     return db.query(
+//         `SELECT * FROM signatures
+//                         WHERE id = $1`,
+//         [rowNum]
+//     );
+// };
+
+// module.exports.countRowsInTable = () => {
+//     return db.query(`SELECT COUNT(*) FROM signatures`);
+// };
+
+function countRowsInTable() {
+    return db.query(`SELECT COUNT(*) FROM signatures`);
+}
+
+function getRowById(rowNum) {
     return db.query(
         `SELECT * FROM signatures
                         WHERE id = $1`,
         [rowNum]
     );
-};
-
-module.exports.countRowsInTable = () => {
-    return db.query(`SELECT COUNT(*) FROM signatures`);
-};
+}
 
 module.exports.addSignature = (name, surname, signature) => {
     // console.log(
@@ -41,4 +53,17 @@ module.exports.addSignature = (name, surname, signature) => {
     // RETURNING id
     const param = [name, surname, signature];
     return db.query(q, param);
+};
+
+module.exports.getSignerByIdAndTotalSigners = (id) => {
+    return new Promise((resolve, reject) => {
+        Promise.all([getRowById(id), countRowsInTable()])
+            .then((result) => {
+                const newResult = [];
+                newResult.push(result[0].rows);
+                newResult.push(result[1].rows[0]);
+                resolve(newResult);
+            })
+            .catch((error) => reject(error));
+    });
 };
