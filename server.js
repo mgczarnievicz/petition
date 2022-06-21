@@ -7,7 +7,10 @@ const { engine } = require("express-handlebars");
 app.engine("handlebars", engine());
 app.set("view engine", "handlebars");
 
-const { getAllSignature, getName, addSignature } = require("./db");
+const secrets = require("./secrets");
+const { SECRET_COOKIE_SESSION } = secrets;
+
+const { getAllSignature, getName, addSignature, getLastId } = require("./db");
 
 const bodyParser = require("body-parser");
 
@@ -18,20 +21,19 @@ app.use(
         /* This is use to generate the signature of the encription. 
         When we recived the cookie, if the signature is not the same that we generate,
         we assume that the cookie was tempted and we distructed. */
-        secret: `I'm always angry.`,
+        secret: SECRET_COOKIE_SESSION,
         // How much the cookie is going to live.
         maxAge: 1000 * 60 * 60 * 24 * 14,
     })
 );
 
-app.get("/read-cookies", (req, res) => {
-    console.log("req.session", req.session);
-    res.sendStatus(200);
-});
-
-app.get("/add-to-cookie", (req, res) => {
-    // Session is an object.
-    req.session.cohort = "cayanne";
+app.use((req, res, next) => {
+    console.log("---------------------");
+    console.log("req.url:", req.url);
+    console.log("req.method:", req.method);
+    console.log("req.session:", req.session);
+    console.log("---------------------");
+    next();
 });
 
 app.use(
@@ -39,7 +41,22 @@ app.use(
         extended: true,
     })
 );
+
 app.use(express.static("./public"));
+
+// Auth function.
+app.use((req, res, next) => {
+    if (req.url != "/petition") {
+        if (req.session.signatureId) {
+            next();
+        } else {
+            // He did not sign.
+            res.redirect("/petition");
+        }
+    } else {
+        next();
+    }
+});
 
 app.get("/petition", (req, res) => {
     console.log("I am in petition");
@@ -53,9 +70,8 @@ app.get("/petition/thanks", (req, res) => {
 
 app.get("/petition/signers", (req, res) => {
     console.log("I am in signers");
-    getAllSignature()
+    getName()
         .then((result) => {
-            console.log("nameList", result.rows);
             const listOfSigners = result.rows;
             res.render("signers", { title: "Signers", listOfSigners });
         })
@@ -71,9 +87,15 @@ app.get("/petition/logout", (req, res) => {
 // POST in pettion is missing.
 app.post("/petition", (req, res) => {
     console.log("Getting info of pettion");
-    console.log("Body:", req.body);
+    // console.log("Body:", req.body);
     addSignature(req.body.name, req.body.surname, req.body.signature)
-        .then(() => res.render("thanks", { title: "Thanks" }))
+        .then((result) => {
+            req.session.signatureId = result.rows[0].id;
+            res.render("thanks", {
+                title: "Thanks",
+                listOfSigners: result.rows,
+            });
+        })
         .catch((err) => {
             console.log("Error:", err);
             res.render("petition", { title: "Petition", error: true });

@@ -19,13 +19,18 @@ module.exports.getName = () => {
     return db.query(`SELECT first, last FROM signatures`);
 };
 
-module.exports.addSignature = (name, surname, signature) => {
-    console.log(
-        `[db]Name: ${name} [db]surnmae: ${surname} signature: ${signature}`
-    );
-    const q = `INSERT INTO signatures (first, last, signature)
-    VALUES ($1, $2, $3 )`;
+module.exports.getLastId = () => {
+    return db.query(`SELECT IDENT_CURRENT('signatures')`);
+};
 
+module.exports.addSignature = (name, surname, signature) => {
+    // console.log(
+    //     `[db]Name: ${name} [db]surnmae: ${surname} signature: ${signature}`
+    // );
+    const q = `INSERT INTO signatures (first, last, signature)
+    VALUES ($1, $2, $3 ) RETURNING id, first, last, signature`;
+
+    // RETURNING id
     const param = [name, surname, signature];
     return db.query(q, param);
 };
