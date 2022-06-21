@@ -1,0 +1,13 @@
+<ul>
+    {{#listOfSigners}}
+        <li><p>{{first}} {{last}} </p>
+           
+            {{#if ../withImage}}
+            <img src="{{signature}}" />
+            {{/if}}
+
+        </li>
+
+    {{/listOfSigners}}
+
+</ul>

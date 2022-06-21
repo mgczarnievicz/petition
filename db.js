@@ -19,8 +19,16 @@ module.exports.getName = () => {
     return db.query(`SELECT first, last FROM signatures`);
 };
 
-module.exports.getLastId = () => {
-    return db.query(`SELECT IDENT_CURRENT('signatures')`);
+module.exports.getRowById = (rowNum) => {
+    return db.query(
+        `SELECT * FROM signatures
+                        WHERE id = $1`,
+        [rowNum]
+    );
+};
+
+module.exports.countRowsInTable = () => {
+    return db.query(`SELECT COUNT(*) FROM signatures`);
 };
 
 module.exports.addSignature = (name, surname, signature) => {

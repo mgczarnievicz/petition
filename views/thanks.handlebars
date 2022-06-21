@@ -1,17 +1,10 @@
 <section class="thanks">
     <h1>Thank you for signing our petition!</h1>
+    <br>
 
-    <ul>
-        {{#listOfSigners}}
-            <li><p>{{first}} {{last}} </p>
-                <img src="{{signature}}" />
+   {{> listSigners withImage=true}}
 
-            </li>
 
-        {{/listOfSigners}}
-
-    </ul>
-
-    <p>See all <a href="/petition/signers"> Signers </a> </p>
+    <p>See all <a href="/petition/signers"> {{totalSigners}} Signers </a> </p>
 
 </section>
