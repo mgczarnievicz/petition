@@ -1,4 +1,4 @@
-<section class="petition">
+<section class="petition-section section-container">
     <h1>Sign up our Petition</h1>
 
     <div class="error">
@@ -7,15 +7,9 @@
         {{/if}}
     </div>
     <form class="petition-form form-container" method="post" action="/petition">
-        <label for="name">Name</label>
-        <input id="name" type="text" name="name" required />
 
-        <label for="surname">Surname</label>
-        <input id="surname" type="text" name="surname" required />
-
-        <label for="signature">Signature</label>
+        <label for="signature-canva">Signature</label>
         <input id="signature" type="hidden" name="signature" />
-
         <canvas width="350" height="100" id="signature-canva"></canvas>
 
         <div class="buttons-container">

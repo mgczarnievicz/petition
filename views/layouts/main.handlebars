@@ -9,7 +9,19 @@
     </head>
     <body>
         <header>
-            <h1>Manu bars is missing.</h1>
+            {{#if withNavBar}}
+                <nav>
+                    {{! PUT HERE THE LINKS WHEN YOU ARE ALREDY LOG IN ! 
+                SEE IF THIS IS WORTH IT PUTTING IT HERE OR IN EACH PAGE DEPENDING 
+                IF THE USER ALLREADY SIGN: }}
+                    {{!  }}
+                    <a href="/petition">Petition</a>
+                    <a href="/signers">List of Signers</a>
+                    <a href="/configuration">Configuration</a>
+
+                </nav>
+            {{/if}}
+
         </header>
         <main>
             {{{body}}}

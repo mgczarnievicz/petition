@@ -1,6 +1,19 @@
-<section class="signers-section">
+
+<section class="signers-section section-container">
     <h1>List of the singers</h1>
 
-   {{> listSigners withImage=false}}
+   <ul>
+    {{#listOfSigners}}
+        <li><p>{{first}} {{last}} </p>
+           
+            {{#if ../withImage}}
+            <img src="{{signature}}" />
+            {{/if}}
+
+        </li>
+
+    {{/listOfSigners}}
+
+</ul>
 
 </section>

@@ -88,14 +88,19 @@ app.use((req, res, next) => {
 });
 
 app.get("/petition", (req, res) => {
-    res.render("petition", { title: "Petition", error: false });
+    res.render("petition", {
+        title: "Petition",
+        withNavBar: true,
+        error: false,
+    });
 });
 
 app.get("/thanks", (req, res) => {
     getSignerByIdAndTotalSigners(req.session.signatureId).then((result) => {
         res.render("thanks", {
             title: "Thanks",
-            listOfSigners: result[0],
+            withNavBar: true,
+            user: result[0],
             totalSigners: result[1].count,
         });
     });
@@ -105,7 +110,11 @@ app.get("/signers", (req, res) => {
     getName()
         .then((result) => {
             const listOfSigners = result.rows;
-            res.render("signers", { title: "Signers", listOfSigners });
+            res.render("signers", {
+                title: "Signers",
+                withNavBar: true,
+                listOfSigners,
+            });
         })
         .catch((err) => console.log("Error:", err));
 });
@@ -117,11 +126,41 @@ app.get("/logout", (req, res) => {
 });
 
 app.get("/home", (req, res) => {
-    res.render("home", { title: "Home", error: false, errMessage: "" });
+    res.render("home", {
+        title: "Home",
+        withNavBar: false,
+        error: false,
+        errMessage: "",
+    });
 });
 
 app.get("/login", (req, res) => {
-    res.render("logIn", { title: "Login", error: false });
+    res.render("logIn", { title: "Login", withNavBar: false, error: false });
+});
+
+app.get("/configuration", (req, res) => {
+    res.render("configuration", {
+        title: "Configuration",
+        withNavBar: true,
+    });
+});
+
+app.get("/profile", (req, res) => {
+    res.render("profile", { title: "Login", withNavBar: true, error: false });
+});
+
+app.get("/signature", (req, res) => {
+    res.render("signature", {
+        title: "Signature",
+        withNavBar: true,
+    });
+});
+
+app.get("/newpassword", (req, res) => {
+    res.render("configuration", {
+        title: "Configuracion",
+        withNavBar: true,
+    });
 });
 
 // POST in pettion is missing.
@@ -135,7 +174,11 @@ app.post("/petition", (req, res) => {
         })
         .catch((err) => {
             console.log("Error:", err);
-            res.render("petition", { title: "Petition", error: true });
+            res.render("petition", {
+                title: "Petition",
+                withNavBar: true,
+                error: true,
+            });
         });
 });
 
@@ -147,6 +190,7 @@ app.post("/home", (req, res) => {
         // Error
         res.render("home", {
             title: "Home",
+            withNavBar: false,
             error: true,
             errMessage: "Empty inputs are not valids",
         });
@@ -161,6 +205,7 @@ app.post("/home", (req, res) => {
             .catch((err) =>
                 res.render("home", {
                     title: "Home",
+                    withNavBar: false,
                     error: true,
                     errMessage: "Oops! an Error has occurred",
                 })
@@ -174,6 +219,7 @@ app.post("/login", (req, res) => {
             if (typeof userLogIn === "string") {
                 res.render("logIn", {
                     title: "Login",
+                    withNavBar: false,
                     error: false,
                     errorFiled: userLogIn,
                 });
@@ -187,6 +233,7 @@ app.post("/login", (req, res) => {
         .catch((err) => {
             res.render("logIn", {
                 title: "Login",
+                withNavBar: false,
                 error: false,
                 errorFiled: "Oops! an Error has occurred",
             });

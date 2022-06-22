@@ -1,1 +1,74 @@
 {{! Show data from the person! }}
+
+<section class="profile-section section-container">
+    <h1>Sign In</h1>
+
+    <div class="error">
+        {{#if error}}
+            <p>{{errMessage}}. Please try again</p>
+        {{/if}}
+    </div>
+
+    <form class="profile-info form-container" method="post">
+        {{#user}}
+            <label for="name">Name</label>
+            <input
+                id="name"
+                type="text"
+                name="name"
+                value="{{name}}"
+                required
+            />
+
+            <label for="surname">Surname</label>
+            <input
+                id="surname"
+                type="text"
+                name="surname"
+                value="{{surname}}"
+                required
+            />
+
+            <label for="email">E-mail</label>
+            <input
+                id="email"
+                type="email"
+                name="email"
+                value="{{email}}"
+                required
+            />
+
+            <label for="age">Age</label>
+            <input id="age" type="number" name="age" value="{{age}}" required />
+
+            <label for="city">City</label>
+            <input
+                id="city"
+                type="text"
+                name="city"
+                value="{{city}}"
+                required
+            />
+
+            <label for="homePage">Home Page</label>
+            <input
+                id="homePage"
+                type="text"
+                name="homePage"
+                value="{{homePage}}"
+                required
+            />
+
+            {{! Here or do a nuw section }}
+            <label for="password">Password</label>
+            <input id="password" type="password" name="password" required />
+
+        {{/user}}
+
+        <div class="buttons-container">
+            <button type="submit">Save Changes</button>
+        </div>
+    </form>
+    <p>Do you already have an account? <a href="/login">Log In</a></p>
+
+</section>

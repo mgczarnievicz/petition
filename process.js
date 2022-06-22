@@ -12,7 +12,7 @@ module.exports.getSignerByIdAndTotalSigners = (id) => {
         Promise.all([getRowById(id), countRowsInTable()])
             .then((result) => {
                 const newResult = [];
-                newResult.push(result[0].rows);
+                newResult.push(result[0].rows[0]);
                 newResult.push(result[1].rows[0]);
                 resolve(newResult);
             })
