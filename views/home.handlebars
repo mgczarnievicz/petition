@@ -1,0 +1,38 @@
+{{> information}}
+
+
+<section class="register-section">
+        <h1>Sign In</h1>
+
+    <div class="error">
+        {{#if error}}
+            <p>Oops! an Error has occurred. Please try again</p>
+        {{/if}}
+    </div>
+
+    <form class="register-form form-container" method="post">
+
+        <label for="name">Name</label>
+        <input id="name" type="text" name="name" required />
+
+        <label for="surname">Surname</label>
+        <input id="surname" type="text" name="surname" required />
+
+        <label for="email">E-mail</label>
+        <input id="email" type="email" name="email" required />
+
+        <label for="email">Password</label>
+        <input id="email" type="password" name="email" required />
+
+        {{! <label for="email">Password</label>
+        <input id="email" type="password" name="email" required /> }}
+
+        <div class="buttons-container">
+            <button type="submit">Register</button>
+        </div>
+    </form>
+    <p>Do you already have an account? <a href="/login">Log In</a></p>
+
+   
+
+</section>

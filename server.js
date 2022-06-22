@@ -64,7 +64,7 @@ app.use((req, res, next) => {
     } else {
         // If the person already signed I want to go to the Thanks page.
         if (req.session.signatureId) {
-            res.redirect("/petition/thanks");
+            res.redirect("/thanks");
         } else {
             next();
         }
@@ -76,7 +76,7 @@ app.get("/petition", (req, res) => {
     res.render("petition", { title: "Petition", error: false });
 });
 
-app.get("/petition/thanks", (req, res) => {
+app.get("/thanks", (req, res) => {
     console.log("I am in thenks");
     getSignerByIdAndTotalSigners(req.session.signatureId).then((result) => {
         res.render("thanks", {
@@ -87,7 +87,7 @@ app.get("/petition/thanks", (req, res) => {
     });
 });
 
-app.get("/petition/signers", (req, res) => {
+app.get("/signers", (req, res) => {
     console.log("I am in signers");
     getName()
         .then((result) => {
@@ -97,7 +97,7 @@ app.get("/petition/signers", (req, res) => {
         .catch((err) => console.log("Error:", err));
 });
 
-app.get("/petition/logout", (req, res) => {
+app.get("/logout", (req, res) => {
     console.log("I am in Logout, we clear the cookies");
     req.session = null;
     res.redirect("/petition");
@@ -109,12 +109,22 @@ app.post("/petition", (req, res) => {
     addSignature(req.body.name, req.body.surname, req.body.signature)
         .then((result) => {
             req.session.signatureId = result.rows[0].id;
-            res.redirect("/petition/thanks");
+            res.redirect("/thanks");
         })
         .catch((err) => {
             console.log("Error:", err);
             res.render("petition", { title: "Petition", error: true });
         });
+});
+
+app.get("/home", (req, res) => {
+    console.log("I am in petition");
+    res.render("home", { title: "Home", error: false });
+});
+
+app.get("/login", (req, res) => {
+    console.log("I am in petition");
+    res.render("logIn", { title: "Login", error: false });
 });
 
 app.listen(PORT, () => {
