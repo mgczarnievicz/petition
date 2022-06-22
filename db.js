@@ -9,7 +9,9 @@ const db = spicedPg(
     `postgres:${USER_NAME}:${USER_PASSWORD}@localhost:5432/${database}`
 );
 
-console.log(`[db] conntecting to ${database}`);
+/* ---------------------------------------------------------------
+                    signatures TABLE
+----------------------------------------------------------------*/
 
 module.exports.getAllSignature = () => {
     return db.query(`SELECT * FROM signatures`);
@@ -19,29 +21,17 @@ module.exports.getName = () => {
     return db.query(`SELECT first, last FROM signatures`);
 };
 
-// module.exports.getRowById = (rowNum) => {
-//     return db.query(
-//         `SELECT * FROM signatures
-//                         WHERE id = $1`,
-//         [rowNum]
-//     );
-// };
-
-// module.exports.countRowsInTable = () => {
-//     return db.query(`SELECT COUNT(*) FROM signatures`);
-// };
-
-function countRowsInTable() {
-    return db.query(`SELECT COUNT(*) FROM signatures`);
-}
-
-function getRowById(rowNum) {
+module.exports.getRowById = (rowNum) => {
     return db.query(
         `SELECT * FROM signatures
                         WHERE id = $1`,
         [rowNum]
     );
-}
+};
+
+module.exports.countRowsInTable = () => {
+    return db.query(`SELECT COUNT(*) FROM signatures`);
+};
 
 module.exports.addSignature = (name, surname, signature) => {
     // console.log(
@@ -55,15 +45,26 @@ module.exports.addSignature = (name, surname, signature) => {
     return db.query(q, param);
 };
 
-module.exports.getSignerByIdAndTotalSigners = (id) => {
-    return new Promise((resolve, reject) => {
-        Promise.all([getRowById(id), countRowsInTable()])
-            .then((result) => {
-                const newResult = [];
-                newResult.push(result[0].rows);
-                newResult.push(result[1].rows[0]);
-                resolve(newResult);
-            })
-            .catch((error) => reject(error));
-    });
+/* ---------------------------------------------------------------
+                    user TABLE
+----------------------------------------------------------------*/
+module.exports.getUserByEmail = (email) => {
+    return db.query(
+        `SELECT * FROM users
+                        WHERE email = $1`,
+        [email]
+    );
+};
+
+module.exports.getCompleteName = () => {
+    return db.query(`SELECT name, surname FROM user`);
+};
+
+module.exports.registerUser = (name, surname, email, password) => {
+    const q = `INSERT INTO users (name, surname, email, password)
+    VALUES ($1, $2, $3, $4 ) RETURNING id, name, surname`;
+
+    // RETURNING all
+    const param = [name, surname, email, password];
+    return db.query(q, param);
 };

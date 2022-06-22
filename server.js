@@ -10,11 +10,25 @@ app.set("view engine", "handlebars");
 const secrets = require("./secrets");
 const { SECRET_COOKIE_SESSION } = secrets;
 
-const { getName, addSignature, getSignerByIdAndTotalSigners } = require("./db");
+const { getName, addSignature } = require("./db");
+const {
+    getSignerByIdAndTotalSigners,
+    registerNewUser,
+    logInVerify,
+    verifyingInputs,
+} = require("./process");
 
 const bodyParser = require("body-parser");
 
 const cookieSession = require("cookie-session");
+
+// FIXME! function not working. doing things by hand.
+function setSessionCookie(session, key, value) {
+    console.log(`key: ${key}, value: ${value}`);
+    session[key] = value;
+    console.log("Session in set function", session);
+    return;
+}
 
 app.use(
     cookieSession({
@@ -29,6 +43,7 @@ app.use(
         sameSite: true,
     })
 );
+
 // For Protection propose
 app.use((req, res, next) => {
     res.setHeader("x-frame-options", "deny");
@@ -52,32 +67,31 @@ app.use(
 
 app.use(express.static("./public"));
 
-// Auth function.
+// REVIEW When we have the tables connected.
 app.use((req, res, next) => {
-    if (req.url != "/petition" && req.url != "/petition/") {
-        if (req.session.signatureId) {
-            next();
-        } else {
-            // He did not sign.
-            res.redirect("/petition");
-        }
-    } else {
-        // If the person already signed I want to go to the Thanks page.
-        if (req.session.signatureId) {
-            res.redirect("/thanks");
-        } else {
-            next();
-        }
-    }
+    // if (req.url != "/petition" && req.url != "/petition/") {
+    //     if (req.session.signatureId) {
+    //         next();
+    //     } else {
+    //         // He did not sign.
+    //         res.redirect("/petition");
+    //     }
+    // } else {
+    //     // If the person already signed I want to go to the Thanks page.
+    //     if (req.session.signatureId) {
+    //         res.redirect("/thanks");
+    //     } else {
+    //         next();
+    //     }
+    // }
+    next();
 });
 
 app.get("/petition", (req, res) => {
-    console.log("I am in petition");
     res.render("petition", { title: "Petition", error: false });
 });
 
 app.get("/thanks", (req, res) => {
-    console.log("I am in thenks");
     getSignerByIdAndTotalSigners(req.session.signatureId).then((result) => {
         res.render("thanks", {
             title: "Thanks",
@@ -88,7 +102,6 @@ app.get("/thanks", (req, res) => {
 });
 
 app.get("/signers", (req, res) => {
-    console.log("I am in signers");
     getName()
         .then((result) => {
             const listOfSigners = result.rows;
@@ -100,7 +113,15 @@ app.get("/signers", (req, res) => {
 app.get("/logout", (req, res) => {
     console.log("I am in Logout, we clear the cookies");
     req.session = null;
-    res.redirect("/petition");
+    res.redirect("/login");
+});
+
+app.get("/home", (req, res) => {
+    res.render("home", { title: "Home", error: false, errMessage: "" });
+});
+
+app.get("/login", (req, res) => {
+    res.render("logIn", { title: "Login", error: false });
 });
 
 // POST in pettion is missing.
@@ -108,6 +129,7 @@ app.post("/petition", (req, res) => {
     console.log("Getting info of pettion");
     addSignature(req.body.name, req.body.surname, req.body.signature)
         .then((result) => {
+            // setSessionCookie(req.session, signatureId, result.rows[0].id);
             req.session.signatureId = result.rows[0].id;
             res.redirect("/thanks");
         })
@@ -117,14 +139,58 @@ app.post("/petition", (req, res) => {
         });
 });
 
-app.get("/home", (req, res) => {
-    console.log("I am in petition");
-    res.render("home", { title: "Home", error: false });
+app.post("/home", (req, res) => {
+    console.log("Getting Home info");
+    console.log("req.body", req.body);
+    // Verify the empty Strings!   Empty inputs are not valids"
+    if (!verifyingInputs(req.body)) {
+        // Error
+        res.render("home", {
+            title: "Home",
+            error: true,
+            errMessage: "Empty inputs are not valids",
+        });
+    } else {
+        registerNewUser(req.body)
+            .then((currentUser) => {
+                console.log("currentUser", currentUser);
+                // setSessionCookie(req.session, userId, currentUser.id);
+                req.session.userId = currentUser.id;
+                res.redirect("/petition");
+            })
+            .catch((err) =>
+                res.render("home", {
+                    title: "Home",
+                    error: true,
+                    errMessage: "Oops! an Error has occurred",
+                })
+            );
+    }
 });
 
-app.get("/login", (req, res) => {
-    console.log("I am in petition");
-    res.render("logIn", { title: "Login", error: false });
+app.post("/login", (req, res) => {
+    logInVerify(req.body)
+        .then((userLogIn) => {
+            if (typeof userLogIn === "string") {
+                res.render("logIn", {
+                    title: "Login",
+                    error: false,
+                    errorFiled: userLogIn,
+                });
+            } else {
+                // setSessionCookie(req.session, userId, userLogIn[0].id);
+                req.session.userId = currentUser.id;
+                // REVIEW: what happend when I have a signature already or not!
+                res.redirect("/petition");
+            }
+        })
+        .catch((err) => {
+            res.render("logIn", {
+                title: "Login",
+                error: false,
+                errorFiled: "Oops! an Error has occurred",
+            });
+        });
 });
 
 app.listen(PORT, () => {

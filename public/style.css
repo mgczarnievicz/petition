@@ -106,29 +106,29 @@ footer {
 /* -----------------------------------------------------------------------
                         Thanks Section
 --------------------------------------------------------------------------*/
-.thanks {
+.thanks-section {
     text-align: center;
 }
-.thanks h1 {
+.thanks-section h1 {
     margin: 10px;
 }
 
-.thanks ul {
+.thanks-section ul {
     margin-bottom: 10px;
 }
 
 /* -----------------------------------------------------------------------
                         Signers Section
 --------------------------------------------------------------------------*/
-.signers {
+.signers-section {
     text-align: center;
 }
-.signers li {
+.signers-section li {
     margin-bottom: 25px;
 }
-.signers h1 {
+.signers-section h1 {
     margin: 10px;
 }
-.signers p {
+.signers-section p {
     margin: 5px;
 }

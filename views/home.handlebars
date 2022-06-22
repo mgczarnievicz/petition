@@ -6,7 +6,7 @@
 
     <div class="error">
         {{#if error}}
-            <p>Oops! an Error has occurred. Please try again</p>
+            <p>{{errMessage}}. Please try again</p>
         {{/if}}
     </div>
 
@@ -21,8 +21,8 @@
         <label for="email">E-mail</label>
         <input id="email" type="email" name="email" required />
 
-        <label for="email">Password</label>
-        <input id="email" type="password" name="email" required />
+        <label for="password">Password</label>
+        <input id="password" type="password" name="password" required />
 
         {{! <label for="email">Password</label>
         <input id="email" type="password" name="email" required /> }}
