@@ -13,12 +13,18 @@
 
   CREATE TABLE signatures (
        id SERIAL PRIMARY KEY,
-      --  user_id INT REFERENCES user(id),
-       user_id INT NOT NULL,
-       first VARCHAR NOT NULL CHECK (first != ''),
-       last VARCHAR NOT NULL CHECK (last != ''),
+       user_id INT REFERENCES user(id) UNIQUE,
        signature VARCHAR NOT NULL CHECK (signature != '')
    );
 
 
+/* Be careful to save things all in lower case email, and first letter capital  */
+
+  CREATE TABLE user_profiles (
+       id SERIAL PRIMARY KEY,
+       user_id INT REFERENCES user(id) UNIQUE,
+       age INT NOT NULL CHECK (age != ''),
+       city VARCHAR NOT NULL CHECK (city != ''),
+       homePage VARCHAR NOT NULL CHECK (homePage != '')
+   );
 

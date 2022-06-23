@@ -17,9 +17,9 @@ module.exports.getAllSignature = () => {
     return db.query(`SELECT * FROM signatures`);
 };
 
-module.exports.getName = () => {
-    return db.query(`SELECT first, last FROM signatures`);
-};
+// module.exports.getName = () => {
+//     return db.query(`SELECT first, last FROM signatures`);
+// };
 
 module.exports.getRowById = (rowNum) => {
     return db.query(
@@ -33,28 +33,21 @@ module.exports.countRowsInTable = () => {
     return db.query(`SELECT COUNT(*) FROM signatures`);
 };
 
-module.exports.addSignature = (name, surname, signature) => {
+module.exports.addSignature = (user_id, signature) => {
     // console.log(
     //     `[db]Name: ${name} [db]surnmae: ${surname} signature: ${signature}`
     // );
-    const q = `INSERT INTO signatures (first, last, signature)
-    VALUES ($1, $2, $3 ) RETURNING id, first, last, signature`;
+    const q = `INSERT INTO signatures (user_id, signature)
+    VALUES ($1, $2 ) RETURNING id`;
 
     // RETURNING id
-    const param = [name, surname, signature];
+    const param = [user_id, signature];
     return db.query(q, param);
 };
 
 /* ---------------------------------------------------------------
                     user TABLE
 ----------------------------------------------------------------*/
-module.exports.getUserByEmail = (email) => {
-    return db.query(
-        `SELECT * FROM users
-                        WHERE email = $1`,
-        [email]
-    );
-};
 
 module.exports.getCompleteName = () => {
     return db.query(`SELECT name, surname FROM user`);
@@ -67,4 +60,31 @@ module.exports.registerUser = (name, surname, email, password) => {
     // RETURNING all
     const param = [name, surname, email, password];
     return db.query(q, param);
+};
+
+/* ---------------------------------------------------------------
+                    JOIN TABLES
+----------------------------------------------------------------*/
+
+// we should do a LEFT JOIN to have all the users and if they have sign  good, if not not.
+module.exports.getUserByEmail = (email) => {
+    return db.query(
+        `SELECT user.*, signature.id AS "signatureId"
+FROM users 
+JOIN signatures
+ON signatures.user_id=user.id
+WHERE email = $1`,
+        [email]
+    );
+};
+
+module.exports.getSigners = () => {
+    return db.query(
+        `SELECT user.*, signature.id AS "signatureId", user_profiles.id AS "profileId"
+FROM users 
+LEFT JOIN signatures
+ON signatures.user_id=user.id  
+LEFT JOIN user_profiles
+ON user_profile.user_id=user.id`
+    );
 };

@@ -7,6 +7,10 @@ const {
 
 const bcrypt = require("./encryption");
 
+function capitalizeFirstLetter(string) {
+    return string.charAt(0).toUpperCase() + string.slice(1).toLowerCase();
+}
+
 module.exports.getSignerByIdAndTotalSigners = (id) => {
     return new Promise((resolve, reject) => {
         Promise.all([getRowById(id), countRowsInTable()])
@@ -38,9 +42,9 @@ exports.registerNewUser = (newUser) => {
             // Saved input in the db.
             console.log("hashpass", hashpass);
             return registerUser(
-                newUser.name,
-                newUser.surname,
-                newUser.email,
+                capitalizeFirstLetter(newUser.name),
+                capitalizeFirstLetter(newUser.surname),
+                newUser.email.toLowerCase(),
                 hashpass
             )
                 .then((dbresult) => dbresult.rows[0])

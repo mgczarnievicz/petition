@@ -10,7 +10,7 @@ app.set("view engine", "handlebars");
 const secrets = require("./secrets");
 const { SECRET_COOKIE_SESSION } = secrets;
 
-const { getName, addSignature } = require("./db");
+const { addSignature, getSigners } = require("./db");
 const {
     getSignerByIdAndTotalSigners,
     registerNewUser,
@@ -69,22 +69,37 @@ app.use(express.static("./public"));
 
 // REVIEW When we have the tables connected.
 app.use((req, res, next) => {
-    // if (req.url != "/petition" && req.url != "/petition/") {
-    //     if (req.session.signatureId) {
-    //         next();
-    //     } else {
-    //         // He did not sign.
-    //         res.redirect("/petition");
-    //     }
-    // } else {
-    //     // If the person already signed I want to go to the Thanks page.
-    //     if (req.session.signatureId) {
-    //         res.redirect("/thanks");
-    //     } else {
-    //         next();
-    //     }
-    // }
-    next();
+    if (!req.session.userId) {
+        if (req.url != "/home" && req.url != "/login") {
+            res.redirect("/home");
+        } else {
+            next();
+        }
+    } else if (req.session.userId) {
+        if (!req.session.signatureId) {
+            if (
+                req.url == "/home" ||
+                req.url == "/login" ||
+                req.url == "/thanks"
+            ) {
+                res.redirect("/petition");
+                // REVIEW: can someone that has not sign see the list of signers
+            } else {
+                next();
+            }
+        } else if (req.session.signatureId) {
+            if (
+                req.url == "/home" ||
+                req.url == "/login" ||
+                req.url == "/petition"
+            ) {
+                res.redirect("/thanks");
+            } else {
+                next();
+            }
+        }
+    }
+    // next();
 });
 
 app.get("/petition", (req, res) => {
@@ -107,7 +122,21 @@ app.get("/thanks", (req, res) => {
 });
 
 app.get("/signers", (req, res) => {
-    getName()
+    getSigners()
+        .then((result) => {
+            const listOfSigners = result.rows;
+            res.render("signers", {
+                title: "Signers",
+                withNavBar: true,
+                listOfSigners,
+            });
+        })
+        .catch((err) => console.log("Error:", err));
+});
+
+app.get("/signers/:city", (req, res) => {
+    // REVIEW Change here
+    getSigners()
         .then((result) => {
             const listOfSigners = result.rows;
             res.render("signers", {
@@ -122,7 +151,7 @@ app.get("/signers", (req, res) => {
 app.get("/logout", (req, res) => {
     console.log("I am in Logout, we clear the cookies");
     req.session = null;
-    res.redirect("/login");
+    res.redirect("/logIn");
 });
 
 app.get("/home", (req, res) => {
@@ -145,18 +174,22 @@ app.get("/configuration", (req, res) => {
     });
 });
 
-app.get("/profile", (req, res) => {
-    res.render("profile", { title: "Login", withNavBar: true, error: false });
+app.get("/configuration/profile", (req, res) => {
+    res.render("configProfile", {
+        title: "Configuration",
+        withNavBar: true,
+        error: false,
+    });
 });
 
-app.get("/signature", (req, res) => {
+app.get("/configuration/signature", (req, res) => {
     res.render("signature", {
-        title: "Signature",
+        title: "Configuration",
         withNavBar: true,
     });
 });
 
-app.get("/newpassword", (req, res) => {
+app.get("/configuration/newpassword", (req, res) => {
     res.render("configuration", {
         title: "Configuracion",
         withNavBar: true,
@@ -166,7 +199,7 @@ app.get("/newpassword", (req, res) => {
 // POST in pettion is missing.
 app.post("/petition", (req, res) => {
     console.log("Getting info of pettion");
-    addSignature(req.body.name, req.body.surname, req.body.signature)
+    addSignature(req.session.userId, req.body.signature)
         .then((result) => {
             // setSessionCookie(req.session, signatureId, result.rows[0].id);
             req.session.signatureId = result.rows[0].id;

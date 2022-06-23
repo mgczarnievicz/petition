@@ -1,0 +1,27 @@
+<section class="profile-section section-container">
+    <h1>Tell us more about you</h1>
+
+    <div class="error">
+        {{#if error}}
+            <p>{{errMessage}}. Please try again</p>
+        {{/if}}
+    </div>
+
+    <form class="profile-info form-container" method="post">
+
+        <label for="age">Age</label>
+        <input id="age" type="number" name="age" />
+
+        <label for="city">City</label>
+        <input id="city" type="text" name="city" />
+
+        <label for="homePage">Home Page</label>
+        <input id="homePage" type="text" name="homePage" />
+
+        <div class="buttons-container">
+            <button type="submit">Save Changes</button>
+        </div>
+    </form>
+    <a href="/petition">Skip this</a>
+
+</section>
