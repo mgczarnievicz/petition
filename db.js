@@ -1,11 +1,14 @@
 const spicedPg = require("spiced-pg");
 
-// Bc we are deploding we need to define where to get the value.
-const USER_NAME = process.env.USER_NAME || require("./secrets").USER_NAME;
+let USER_NAME, USER_PASSWORD;
 
-// Bc we are deploding we need to define where to get the value.
-const USER_PASSWORD =
-    process.env.USER_PASSWORD || require("./secrets").USER_PASSWORD;
+if (process.env.NODE_ENV === "production") {
+    // Bc we are deploding we need to define where to get the value.
+    USER_NAME = require("./secrets").USER_NAME;
+
+    // Bc we are deploding we need to define where to get the value.
+    USER_PASSWORD = require("./secrets").USER_PASSWORD;
+}
 
 const database = "petition";
 
