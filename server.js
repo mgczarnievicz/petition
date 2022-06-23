@@ -7,8 +7,9 @@ const { engine } = require("express-handlebars");
 app.engine("handlebars", engine());
 app.set("view engine", "handlebars");
 
-const secrets = require("./secrets");
-const { SECRET_COOKIE_SESSION } = secrets;
+// Bc we are deploding we need to define where to get the value.
+const COOKIE_SECRET =
+    process.env.COOKIE_SECRET || require("./secrets").COOKIE_SECRET;
 
 const { addSignature, getSigners } = require("./db");
 const {
@@ -35,7 +36,7 @@ app.use(
         /* This is use to generate the signature of the encription. 
         When we recived the cookie, if the signature is not the same that we generate,
         we assume that the cookie was tempted and we distructed. */
-        secret: SECRET_COOKIE_SESSION,
+        secret: COOKIE_SECRET,
         // How much the cookie is going to live.
         maxAge: 1000 * 60 * 60 * 24 * 14,
 
@@ -83,7 +84,7 @@ app.use((req, res, next) => {
                 req.url == "/thanks"
             ) {
                 res.redirect("/petition");
-                // REVIEW: can someone that has not sign see the list of signers
+                // REVIEW: can someone that has not sign see the list of signers. see if the url contains signers
             } else {
                 next();
             }
@@ -273,7 +274,7 @@ app.post("/login", (req, res) => {
         });
 });
 
-app.listen(PORT, () => {
+app.listen(process.env.PORT || PORT, () => {
     console.log(
         `\t Server is lisening on port ${PORT}\n\t http://localhost:${PORT}/petition\n`
     );

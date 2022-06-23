@@ -54,6 +54,7 @@ exports.registerNewUser = (newUser) => {
 };
 
 exports.logInVerify = (userLogIn) => {
+    // FIXME! I can not log in!!!!
     return getUserByEmail(userLogIn.email)
         .catch((err) => err)
         .then((result) => {

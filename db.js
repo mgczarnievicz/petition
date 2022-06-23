@@ -1,12 +1,17 @@
 const spicedPg = require("spiced-pg");
 
-const secrets = require("./secrets");
-const { USER_NAME, USER_PASSWORD } = secrets;
+// Bc we are deploding we need to define where to get the value.
+const USER_NAME = process.env.USER_NAME || require("./secrets").USER_NAME;
+
+// Bc we are deploding we need to define where to get the value.
+const USER_PASSWORD =
+    process.env.USER_PASSWORD || require("./secrets").USER_PASSWORD;
 
 const database = "petition";
 
 const db = spicedPg(
-    `postgres:${USER_NAME}:${USER_PASSWORD}@localhost:5432/${database}`
+    process.env.DATABASE_URL ||
+        `postgres:${USER_NAME}:${USER_PASSWORD}@localhost:5432/${database}`
 );
 
 /* ---------------------------------------------------------------
