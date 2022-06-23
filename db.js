@@ -28,15 +28,7 @@ module.exports.getAllSignature = () => {
 //     return db.query(`SELECT first, last FROM signatures`);
 // };
 
-module.exports.getRowById = (rowNum) => {
-    return db.query(
-        `SELECT * FROM signatures
-                        WHERE id = $1`,
-        [rowNum]
-    );
-};
-
-module.exports.countRowsInTable = () => {
+module.exports.countSignatures = () => {
     return db.query(`SELECT COUNT(*) FROM signatures`);
 };
 
@@ -53,7 +45,7 @@ module.exports.addSignature = (user_id, signature) => {
 };
 
 /* ---------------------------------------------------------------
-                    user TABLE
+                    users TABLE
 ----------------------------------------------------------------*/
 
 module.exports.getCompleteName = () => {
@@ -70,16 +62,26 @@ module.exports.registerUser = (name, surname, email, password) => {
 };
 
 /* ---------------------------------------------------------------
+                    user Profiles TABLE
+----------------------------------------------------------------*/
+module.exports.addUserInfo = (user_id, age, city, profilePage) => {
+    const q = `INSERT INTO users (user_id, age, city, profilePage)
+    VALUES ($1, $2, $3, $4 )`;
+
+    const param = [user_id, age, city, profilePage];
+    return db.query(q, param);
+};
+/* ---------------------------------------------------------------
                     JOIN TABLES
 ----------------------------------------------------------------*/
 
 // we should do a LEFT JOIN to have all the users and if they have sign  good, if not not.
 module.exports.getUserByEmail = (email) => {
     return db.query(
-        `SELECT user.*, signature.id AS "signatureId"
+        `SELECT users.*, signatures.id AS "signatureId"
 FROM users 
-JOIN signatures
-ON signatures.user_id=user.id
+LEFT JOIN signatures
+ON signatures.user_id=users.id
 WHERE email = $1`,
         [email]
     );
@@ -87,11 +89,24 @@ WHERE email = $1`,
 
 module.exports.getSigners = () => {
     return db.query(
-        `SELECT user.*, signature.id AS "signatureId", user_profiles.id AS "profileId"
+        `SELECT users.*, signatures.id AS "signatureId", user_profiles.id AS "profileId"
 FROM users 
 LEFT JOIN signatures
-ON signatures.user_id=user.id  
+ON signatures.user_id=users.id  
 LEFT JOIN user_profiles
-ON user_profile.user_id=user.id`
+ON user_profile.user_id=users.id`
+    );
+};
+
+module.exports.getUserById = (rowNum) => {
+    return db.query(
+        `SELECT users.*, signatures.id AS "signatureId"
+FROM users 
+LEFT JOIN signatures
+ON signatures.user_id=users.id
+LEFT JOIN user_profiles
+ON user_profile.user_id=users.id
+WHERE id = $1`,
+        [rowNum]
     );
 };

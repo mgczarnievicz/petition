@@ -1,8 +1,9 @@
 const {
-    getRowById,
-    countRowsInTable,
+    getUserById,
+    countSignatures,
     registerUser,
     getUserByEmail,
+    addUserInfo,
 } = require("./db");
 
 const bcrypt = require("./encryption");
@@ -11,9 +12,18 @@ function capitalizeFirstLetter(string) {
     return string.charAt(0).toUpperCase() + string.slice(1).toLowerCase();
 }
 
+function allStringsAreEmpty(obj) {
+    for (let key in obj) {
+        if (obj[key].trim().length != 0) {
+            return false;
+        }
+    }
+    return true;
+}
+
 module.exports.getSignerByIdAndTotalSigners = (id) => {
     return new Promise((resolve, reject) => {
-        Promise.all([getRowById(id), countRowsInTable()])
+        Promise.all([getUserById(id), countSignatures()])
             .then((result) => {
                 const newResult = [];
                 newResult.push(result[0].rows[0]);
@@ -23,7 +33,8 @@ module.exports.getSignerByIdAndTotalSigners = (id) => {
             .catch((error) => reject(error));
     });
 };
-
+// false -> input empty.
+// true -> input with stuf.
 exports.verifyingInputs = (obj) => {
     for (let key in obj) {
         if (obj[key].trim().length === 0) {
@@ -54,14 +65,11 @@ exports.registerNewUser = (newUser) => {
 };
 
 exports.logInVerify = (userLogIn) => {
-    // FIXME! I can not log in!!!!
-    return getUserByEmail(userLogIn.email)
+    return getUserByEmail(userLogIn.email.toLowerCase())
         .catch((err) => err)
         .then((result) => {
             // See what we recived and if there is a result, then se
             // if its empty or not.
-            console.log("result.rows", result.rows);
-            console.log("result.rows.lenght", result.rows.length);
 
             if (result.rows.length === 0) {
                 console.log("Email not register");
@@ -71,12 +79,41 @@ exports.logInVerify = (userLogIn) => {
                 .compare(userLogIn.password, result.rows[0].password)
                 .catch((err) => err)
                 .then((isCorrect) => {
-                    let answer = "";
                     if (isCorrect) {
-                        return result.rows;
+                        console.log("You Are In!");
+                        return result.rows[0];
                     } else {
+                        console.log("Password Incorrect");
                         return "Password Incorrect";
                     }
                 });
         });
+};
+
+exports.addMoreInfo = (moreInfo, userId) => {
+    if (allStringsAreEmpty(moreInfo)) {
+        // All input are empty so we dont save
+        return;
+    }
+    let profilePage = "",
+        city = "",
+        age = 0;
+
+    // If not there was at least one input startsWith()
+    // capitalizeFirstLetter
+    if (moreInfo.profilePage) {
+        profilePage = moreInfo.profilePage;
+        if (
+            profilePage.startsWith("http://") ||
+            profilePage.startsWith("https://") ||
+            profilePage.startsWith("//")
+        ) {
+            return "Profile Page Not accepted.";
+        }
+    }
+    city = city || moreInfo.city;
+    age = age || moreInfo.age;
+
+    // write in the data base.
+    return addUserInfo(userId, age, capitalizeFirstLetter(city), profilePage);
 };

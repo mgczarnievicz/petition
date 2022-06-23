@@ -22,9 +22,9 @@
   CREATE TABLE user_profiles (
        id SERIAL PRIMARY KEY,
        user_id INT REFERENCES users(id) UNIQUE,
-       age INT NOT NULL,
-       city VARCHAR NOT NULL CHECK (city != ''),
-       homePage VARCHAR NOT NULL CHECK (homePage != '')
+       age INT,
+       city VARCHAR,
+       profilePage VARCHAR
    );
 
 

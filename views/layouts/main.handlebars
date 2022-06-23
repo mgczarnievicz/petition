@@ -15,8 +15,12 @@
                 SEE IF THIS IS WORTH IT PUTTING IT HERE OR IN EACH PAGE DEPENDING 
                 IF THE USER ALLREADY SIGN: }}
                     {{!  }}
-                    <a href="/petition">Petition</a>
-                    <a href="/signers">List of Signers</a>
+                    {{#if haveSign}}
+                        <a href="/signers">List of Signers</a>
+                    {{else}}
+                        <a href="/petition">Petition</a>
+                    {{/if}}
+
                     <a href="/configuration">Configuration</a>
                     <a href="/logout">Log Out</a>
 

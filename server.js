@@ -17,6 +17,7 @@ const {
     registerNewUser,
     logInVerify,
     verifyingInputs,
+    addMoreInfo,
 } = require("./process");
 
 const bodyParser = require("body-parser");
@@ -81,10 +82,10 @@ app.use((req, res, next) => {
             if (
                 req.url == "/home" ||
                 req.url == "/login" ||
-                req.url == "/thanks"
+                req.url == "/thanks" ||
+                req.url.includes("/signers")
             ) {
                 res.redirect("/petition");
-                // REVIEW: can someone that has not sign see the list of signers. see if the url contains signers
             } else {
                 next();
             }
@@ -92,7 +93,8 @@ app.use((req, res, next) => {
             if (
                 req.url == "/home" ||
                 req.url == "/login" ||
-                req.url == "/petition"
+                req.url == "/petition" ||
+                req.url == "/profile"
             ) {
                 res.redirect("/thanks");
             } else {
@@ -100,13 +102,13 @@ app.use((req, res, next) => {
             }
         }
     }
-    // next();
 });
 
 app.get("/petition", (req, res) => {
     res.render("petition", {
         title: "Petition",
         withNavBar: true,
+        haveSign: false,
         error: false,
     });
 });
@@ -116,6 +118,7 @@ app.get("/thanks", (req, res) => {
         res.render("thanks", {
             title: "Thanks",
             withNavBar: true,
+            haveSign: true,
             user: result[0],
             totalSigners: result[1].count,
         });
@@ -129,6 +132,7 @@ app.get("/signers", (req, res) => {
             res.render("signers", {
                 title: "Signers",
                 withNavBar: true,
+                haveSign: true,
                 listOfSigners,
             });
         })
@@ -143,6 +147,7 @@ app.get("/signers/:city", (req, res) => {
             res.render("signers", {
                 title: "Signers",
                 withNavBar: true,
+                haveSign: true,
                 listOfSigners,
             });
         })
@@ -152,26 +157,35 @@ app.get("/signers/:city", (req, res) => {
 app.get("/logout", (req, res) => {
     console.log("I am in Logout, we clear the cookies");
     req.session = null;
-    res.redirect("/logIn");
+    res.redirect("/login");
 });
 
 app.get("/home", (req, res) => {
     res.render("home", {
         title: "Home",
         withNavBar: false,
+        haveSign: false,
         error: false,
         errMessage: "",
     });
 });
 
 app.get("/login", (req, res) => {
-    res.render("logIn", { title: "Login", withNavBar: false, error: false });
+    res.render("logIn", {
+        title: "Login",
+        withNavBar: false,
+        haveSign: false,
+        error: false,
+    });
 });
 
 app.get("/configuration", (req, res) => {
+    // This can not be done, any numbre is singatureId exist is truthy.
+    const haveSign = req.session.signatureId ? true : false;
     res.render("configuration", {
         title: "Configuration",
         withNavBar: true,
+        haveSign: haveSign,
     });
 });
 
@@ -179,6 +193,7 @@ app.get("/configuration/profile", (req, res) => {
     res.render("configProfile", {
         title: "Configuration",
         withNavBar: true,
+        haveSign: req.session.signatureId,
         error: false,
     });
 });
@@ -186,6 +201,7 @@ app.get("/configuration/profile", (req, res) => {
 app.get("/configuration/signature", (req, res) => {
     res.render("signature", {
         title: "Configuration",
+        haveSign: req.session.signatureId,
         withNavBar: true,
     });
 });
@@ -193,7 +209,17 @@ app.get("/configuration/signature", (req, res) => {
 app.get("/configuration/newpassword", (req, res) => {
     res.render("configuration", {
         title: "Configuracion",
+        haveSign: req.session.signatureId,
         withNavBar: true,
+    });
+});
+
+app.get("/profile", (req, res) => {
+    res.render("moreInfo", {
+        title: "Profile",
+        withNavBar: true,
+        haveSign: false,
+        error: false,
     });
 });
 
@@ -211,6 +237,7 @@ app.post("/petition", (req, res) => {
             res.render("petition", {
                 title: "Petition",
                 withNavBar: true,
+                haveSign: req.session.signatureId,
                 error: true,
             });
         });
@@ -225,6 +252,7 @@ app.post("/home", (req, res) => {
         res.render("home", {
             title: "Home",
             withNavBar: false,
+            haveSign: false,
             error: true,
             errMessage: "Empty inputs are not valids",
         });
@@ -234,12 +262,13 @@ app.post("/home", (req, res) => {
                 console.log("currentUser", currentUser);
                 // setSessionCookie(req.session, userId, currentUser.id);
                 req.session.userId = currentUser.id;
-                res.redirect("/petition");
+                res.redirect("/profile");
             })
             .catch((err) =>
                 res.render("home", {
                     title: "Home",
                     withNavBar: false,
+                    haveSign: false,
                     error: true,
                     errMessage: "Oops! an Error has occurred",
                 })
@@ -248,34 +277,78 @@ app.post("/home", (req, res) => {
 });
 
 app.post("/login", (req, res) => {
+    console.log("Inmedianto req.body", req.body);
     logInVerify(req.body)
         .then((userLogIn) => {
+            console.log("userLogIn", userLogIn);
             if (typeof userLogIn === "string") {
                 res.render("logIn", {
                     title: "Login",
                     withNavBar: false,
+                    haveSign: false,
                     error: false,
                     errorFiled: userLogIn,
                 });
             } else {
+                console.log("userLogIn not a string");
                 // setSessionCookie(req.session, userId, userLogIn[0].id);
-                req.session.userId = currentUser.id;
-                // REVIEW: what happend when I have a signature already or not!
-                res.redirect("/petition");
+                req.session.userId = userLogIn.id;
+
+                if (userLogIn.signatureId) {
+                    req.session.signatureId = userLogIn.signatureId;
+                    res.redirect("/thanks");
+                } else {
+                    res.redirect("/petition");
+                }
             }
         })
         .catch((err) => {
+            console.log("Error in log In", err);
             res.render("logIn", {
                 title: "Login",
                 withNavBar: false,
+                haveSign: false,
                 error: false,
                 errorFiled: "Oops! an Error has occurred",
             });
         });
 });
 
+app.post("/petition", (req, res) => {
+    console.log("Getting info of pettion");
+    addSignature(req.session.userId, req.body.signature)
+        .then((result) => {
+            // setSessionCookie(req.session, signatureId, result.rows[0].id);
+            req.session.signatureId = result.rows[0].id;
+            res.redirect("/thanks");
+        })
+        .catch((err) => {
+            console.log("Error:", err);
+            res.render("petition", {
+                title: "Petition",
+                withNavBar: true,
+                haveSign: req.session.signatureId,
+                error: true,
+            });
+        });
+});
+
+app.post("/profile", (req, res) => {
+    console.log("req.body", req.body);
+    addMoreInfo(req.body, req.session.userId)
+        .then(() =>
+            res.render("moreInfo", {
+                title: "Profile",
+                withNavBar: true,
+                haveSign: false,
+                error: false,
+            })
+        )
+        .catch((err) => console.log("Error Profile:", err));
+});
+
 app.listen(process.env.PORT || PORT, () => {
     console.log(
-        `\t Server is lisening on port ${PORT}\n\t http://localhost:${PORT}/petition\n`
+        `\t Server is lisening on port ${PORT}\n\t http://localhost:${PORT}/home\n`
     );
 });
