@@ -5,10 +5,14 @@
         <a class="config-tag" href="/configuration/profile">Profile</a>
     </div>
 
-    <div>
-        <a href="/configuration/signature"><img src="/img/signature.webp" /></a>
-        <a class="config-tag" href="/configuration/signature">Signature</a>
-    </div>
+    {{#if haveSign}}
+        <div>
+            <a href="/configuration/signature"><img
+                    src="/img/signature.webp"
+                /></a>
+            <a class="config-tag" href="/configuration/signature">Signature</a>
+        </div>
+    {{/if}}
 
     <div>
         <a href="/configuration/newpassword"><img src="/img/password.png" /></a>

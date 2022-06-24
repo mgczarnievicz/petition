@@ -39,20 +39,21 @@
             />
 
             <label for="age">Age</label>
-            <input id="age" type="number" name="age" value="{{age}}" />
+            <input id="age" type="number" name="age" value={{age}} />
 
             <label for="city">City</label>
-            <input id="city" type="text" name="city" value="{{city}}" />
+            <input id="city" type="text" name="city" value={{city}} />
 
             <label for="homePage">Home Page</label>
             <input
                 id="homePage"
-                type="text"
+                type="url"
                 name="homePage"
-                value="{{homePage}}"
+                value={{homePage}}
             />
 
-            {{! Here or do a nuw section }}
+            {{! Here or do a nuw section this is for a new password!!! this should be empty}}
+            <p>Confirm Password to save changes.</p>
             <label for="password">Password</label>
             <input id="password" type="password" name="password" required />
 
@@ -60,8 +61,9 @@
 
         <div class="buttons-container">
             <button type="submit">Save Changes</button>
+            <a href="/configuration" class="likeButton">Back</a>
+
         </div>
     </form>
-    <p>Do you already have an account? <a href="/login">Log In</a></p>
 
 </section>

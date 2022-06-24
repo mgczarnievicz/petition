@@ -102,11 +102,19 @@ nav a:hover {
     text-align: center;
 }
 
-.form-container button {
+.form-container button,
+.form-container .likeButton {
     height: 35px;
     width: 150px;
     border-radius: 9px;
     border: 1.5 solid rgb(164, 100, 224);
+}
+
+.buttons-container .likeButton {
+    text-decoration: none;
+    border: 2px solid black;
+    padding: 6.5px 60px;
+    background-color: whitesmoke;
 }
 
 /* -----------------------------------------------------------------------
@@ -163,6 +171,7 @@ nav a:hover {
     flex-direction: row;
     justify-content: space-evenly;
     align-items: center;
+    flex-wrap: wrap;
 }
 
 .configuration-section img {
@@ -177,6 +186,7 @@ nav a:hover {
     flex-direction: column;
     justify-content: center;
     align-items: center;
+    padding: 10px;
 }
 
 .configuration-section a {

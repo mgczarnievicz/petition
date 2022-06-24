@@ -28,6 +28,14 @@ module.exports.getAllSignature = () => {
 //     return db.query(`SELECT first, last FROM signatures`);
 // };
 
+module.exports.getSignatureBySignatureId = (rowNum) => {
+    return db.query(
+        `SELECT * FROM signatures
+                        WHERE id = $1`,
+        [rowNum]
+    );
+};
+
 module.exports.countSignatures = () => {
     return db.query(`SELECT COUNT(*) FROM signatures`);
 };
@@ -61,16 +69,37 @@ module.exports.registerUser = (name, surname, email, password) => {
     return db.query(q, param);
 };
 
+module.exports.updateUser = (name, surname, email, password, userId) => {
+    const q = `UPDATE users (name, surname, email, password)
+    SET name = $1, surname = $2, email = $3, password =$4  
+    WHERE id = $5`;
+
+    // RETURNING all
+    const param = [name, surname, email, password, userId];
+    return db.query(q, param);
+};
+
 /* ---------------------------------------------------------------
                     user Profiles TABLE
 ----------------------------------------------------------------*/
 module.exports.addUserInfo = (user_id, age, city, profilePage) => {
-    const q = `INSERT INTO users (user_id, age, city, profilePage)
-    VALUES ($1, $2, $3, $4 )`;
+    const q = `INSERT INTO user_profiles (user_id, age, city, profilePage)
+    VALUES ($1, $2, $3, $4 ) RETURNING id`;
 
     const param = [user_id, age, city, profilePage];
     return db.query(q, param);
 };
+
+module.exports.updateProfile = (user_id, age, city, profilePage) => {
+    const q = ` INSERT INTO user_profiles (user_id, age, city, profilePage)
+    VALUES ($1, $2, $3, $4)
+    ON CONFLICT (users_id)
+    DO UPDATE SET age=$2, city=$3,profilePage=$4`;
+    const param = [user_id, age, city, profilePage];
+
+    return db.query(q, param);
+};
+
 /* ---------------------------------------------------------------
                     JOIN TABLES
 ----------------------------------------------------------------*/
@@ -87,26 +116,39 @@ WHERE email = $1`,
     );
 };
 
+// When we want all signers!!!!
 module.exports.getSigners = () => {
     return db.query(
-        `SELECT users.*, signatures.id AS "signatureId", user_profiles.id AS "profileId"
+        `SELECT users.name, users.surname, signatures.id AS "signatureId", user_profiles.age, user_profiles.city, user_profiles.profilePage
 FROM users 
-LEFT JOIN signatures
+RIGHT JOIN signatures
 ON signatures.user_id=users.id  
 LEFT JOIN user_profiles
-ON user_profile.user_id=users.id`
+ON user_profiles.user_id=users.id`
     );
 };
 
-module.exports.getUserById = (rowNum) => {
+module.exports.getSignersByCity = (searchCity) => {
     return db.query(
-        `SELECT users.*, signatures.id AS "signatureId"
+        `SELECT users.name, users.surname, signatures.id AS "signatureId", user_profiles.age, user_profiles.profilePage
 FROM users 
-LEFT JOIN signatures
-ON signatures.user_id=users.id
+RIGHT JOIN signatures
+ON signatures.user_id=users.id  
+JOIN user_profiles
+ON user_profiles.user_id=users.id
+WHERE user_profiles.city = $1`,
+        [searchCity]
+    );
+};
+
+// REVIEW!!! is not working we are not using it!
+module.exports.getUserInformationById = (rowNum) => {
+    return db.query(
+        `SELECT users.name, users.surname, users.email, user_profiles.age, user_profiles.city, user_profiles.profilePage
+FROM users 
 LEFT JOIN user_profiles
-ON user_profile.user_id=users.id
-WHERE id = $1`,
+ON user_profiles.user_id=users.id
+WHERE users.id = $1`,
         [rowNum]
     );
 };

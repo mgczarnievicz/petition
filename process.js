@@ -4,6 +4,7 @@ const {
     registerUser,
     getUserByEmail,
     addUserInfo,
+    getSignatureBySignatureId,
 } = require("./db");
 
 const bcrypt = require("./encryption");
@@ -21,17 +22,18 @@ function allStringsAreEmpty(obj) {
     return true;
 }
 
-module.exports.getSignerByIdAndTotalSigners = (id) => {
-    return new Promise((resolve, reject) => {
-        Promise.all([getUserById(id), countSignatures()])
-            .then((result) => {
-                const newResult = [];
-                newResult.push(result[0].rows[0]);
-                newResult.push(result[1].rows[0]);
-                resolve(newResult);
-            })
-            .catch((error) => reject(error));
-    });
+module.exports.getSignatureByIdAndTotalSigners = (signatureId) => {
+    return Promise.all([
+        getSignatureBySignatureId(signatureId),
+        countSignatures(),
+    ])
+        .then((result) => {
+            const newResult = [];
+            newResult.push(result[0].rows[0]);
+            newResult.push(result[1].rows[0]);
+            return newResult;
+        })
+        .catch((error) => error);
 };
 // false -> input empty.
 // true -> input with stuf.
@@ -95,25 +97,30 @@ exports.addMoreInfo = (moreInfo, userId) => {
         // All input are empty so we dont save
         return;
     }
-    let profilePage = "",
-        city = "",
-        age = 0;
+    let profilePage = null,
+        city = null,
+        age = null;
 
+    // REVIEW. test to see that we dont need it
     // If not there was at least one input startsWith()
     // capitalizeFirstLetter
-    if (moreInfo.profilePage) {
-        profilePage = moreInfo.profilePage;
-        if (
-            profilePage.startsWith("http://") ||
-            profilePage.startsWith("https://") ||
-            profilePage.startsWith("//")
-        ) {
-            return "Profile Page Not accepted.";
-        }
-    }
-    city = city || moreInfo.city;
-    age = age || moreInfo.age;
+    // if (moreInfo.profilePage.length != 0) {
+    //     profilePage = moreInfo.profilePage;
+    //     console.log("profilePage", profilePage);
+    //     if (
+    //         profilePage.startsWith("http://") ||
+    //         profilePage.startsWith("https://") ||
+    //         profilePage.startsWith("//")
+    //     ) {
+    //         return "Profile Page Not accepted.";
+    //     }
+    // }
+    profilePage = moreInfo.profilePage || null;
+    city = moreInfo.city || city;
+    age = moreInfo.age || age;
 
     // write in the data base.
-    return addUserInfo(userId, age, capitalizeFirstLetter(city), profilePage);
+    return addUserInfo(userId, age, capitalizeFirstLetter(city), profilePage)
+        .then((result) => result)
+        .catch((err) => err);
 };

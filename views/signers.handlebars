@@ -1,19 +1,21 @@
-
 <section class="signers-section section-container">
     <h1>List of the singers</h1>
 
-   <ul>
-    {{#listOfSigners}}
-        <li><p>{{first}} {{last}} </p>
-           
-            {{#if ../withImage}}
-            <img src="{{signature}}" />
-            {{/if}}
+    <table>
+        {{#listOfSigners}}
+            <tr>
+                <td>{{name}} {{surname}} </td>
+                {{#if age}}
+                    <td>{{age}}</td>
+                {{/if}}
 
-        </li>
+                {{#if city}}
+                    <td> <a href="/signers/{{city}}">{{city}}</a> </td>
+                {{/if}}
 
-    {{/listOfSigners}}
+            </tr>
+        {{/listOfSigners}}
 
-</ul>
+    </table>
 
 </section>

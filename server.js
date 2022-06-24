@@ -11,9 +11,18 @@ app.set("view engine", "handlebars");
 const COOKIE_SECRET =
     process.env.COOKIE_SECRET || require("./secrets").COOKIE_SECRET;
 
-const { addSignature, getSigners } = require("./db");
 const {
-    getSignerByIdAndTotalSigners,
+    addSignature,
+    getSigners,
+    getSignersByCity,
+    getUserInformationById,
+    updateUser,
+    updateProfile,
+    getSignatureBySignatureId,
+} = require("./db");
+
+const {
+    getSignatureByIdAndTotalSigners,
     registerNewUser,
     logInVerify,
     verifyingInputs,
@@ -114,7 +123,8 @@ app.get("/petition", (req, res) => {
 });
 
 app.get("/thanks", (req, res) => {
-    getSignerByIdAndTotalSigners(req.session.signatureId).then((result) => {
+    console.log("req.session.signatureId", req.session.signatureId);
+    getSignatureByIdAndTotalSigners(req.session.signatureId).then((result) => {
         res.render("thanks", {
             title: "Thanks",
             withNavBar: true,
@@ -129,6 +139,7 @@ app.get("/signers", (req, res) => {
     getSigners()
         .then((result) => {
             const listOfSigners = result.rows;
+            console.log("listOfSigners", listOfSigners);
             res.render("signers", {
                 title: "Signers",
                 withNavBar: true,
@@ -140,8 +151,8 @@ app.get("/signers", (req, res) => {
 });
 
 app.get("/signers/:city", (req, res) => {
-    // REVIEW Change here
-    getSigners()
+    console.log("req.params", req.params);
+    getSignersByCity(req.params.city)
         .then((result) => {
             const listOfSigners = result.rows;
             res.render("signers", {
@@ -181,33 +192,53 @@ app.get("/login", (req, res) => {
 
 app.get("/configuration", (req, res) => {
     // This can not be done, any numbre is singatureId exist is truthy.
-    const haveSign = req.session.signatureId ? true : false;
     res.render("configuration", {
         title: "Configuration",
         withNavBar: true,
-        haveSign: haveSign,
+        haveSign: req.session.signatureId,
     });
 });
 
 app.get("/configuration/profile", (req, res) => {
-    res.render("configProfile", {
-        title: "Configuration",
-        withNavBar: true,
-        haveSign: req.session.signatureId,
-        error: false,
-    });
+    getUserInformationById(req.session.userId)
+        .then((result) => {
+            console.log("result.rows", result.rows[0]);
+
+            res.render("configProfile", {
+                title: "Configuration",
+                withNavBar: true,
+                haveSign: req.session.signatureId,
+                error: false,
+                user: result.rows[0],
+            });
+        })
+        .catch((err) => console.log("Error getUserInformationById:", err));
 });
 
 app.get("/configuration/signature", (req, res) => {
-    res.render("signature", {
-        title: "Configuration",
+    getSignatureBySignatureId(req.session.signatureId)
+        .then((result) => {
+            console.log("result.rows", result.rows);
+            res.render("signature", {
+                title: "Configuration",
+                haveSign: req.session.signatureId,
+                withNavBar: true,
+                signature: result.rows[0],
+            });
+        })
+        .catch((err) => console.log("Error in config/signature", err));
+});
+
+app.get("/configuration/newpassword", (req, res) => {
+    res.render("newPassword", {
+        title: "Configuracion",
         haveSign: req.session.signatureId,
         withNavBar: true,
     });
 });
 
-app.get("/configuration/newpassword", (req, res) => {
-    res.render("configuration", {
+app.get("/configuration/deleteAccount", (req, res) => {
+    res.render("deleteAccount", {
         title: "Configuracion",
         haveSign: req.session.signatureId,
         withNavBar: true,
@@ -335,16 +366,47 @@ app.post("/petition", (req, res) => {
 
 app.post("/profile", (req, res) => {
     console.log("req.body", req.body);
+    console.log("req.session.userId ", req.session.userId);
     addMoreInfo(req.body, req.session.userId)
-        .then(() =>
-            res.render("moreInfo", {
-                title: "Profile",
-                withNavBar: true,
-                haveSign: false,
-                error: false,
-            })
-        )
+        .then(() => res.redirect("/petition"))
         .catch((err) => console.log("Error Profile:", err));
+});
+
+app.post("/configuration/profile", (req, res) => {
+    console.log("req.body in config User", req.body);
+    console.log("req.session.userId ", req.session.userId);
+    // First verify Password if password correct then all good.
+
+    const uesrInfo = req.body;
+    //  updateUser (name, surname, email, password, userId)
+    // updateProfile = (user_id, age, city, profilePage)
+    Promise.all([
+        updateUser(
+            uesrInfo.name,
+            uesrInfo.surname,
+            uesrInfo.email,
+            uesrInfo.password,
+            req.session.userId
+        ),
+        updateProfile(
+            req.session.userId,
+            uesrInfo.age,
+            uesrInfo.city,
+            uesrInfo.profilePage
+        ),
+    ])
+        .then(() => res.redirect("/configuration"))
+        .catch((err) => {
+            console.log("Erro Updating user", err);
+            // REVIEW: i do sthing different.
+            window.alert("An error ocurr. Try again.");
+            res.redirect("/configuration/profile");
+        });
+
+    //If not, not save changes.
+    // addMoreInfo(req.body, req.session.userId)
+    //     .then(() => res.redirect("/petition"))
+    //     .catch((err) => console.log("Error Profile:", err));
 });
 
 app.listen(process.env.PORT || PORT, () => {
