@@ -1,5 +1,8 @@
 <section class="signers-section section-container">
     <h1>List of the singers</h1>
+    {{#if nameCity}}
+        <h3>In the city of: {{nameCity}}</h3>
+    {{/if}}
 
     <table>
         {{#listOfSigners}}

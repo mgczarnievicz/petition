@@ -98,8 +98,7 @@ exports.addMoreInfo = (moreInfo, userId) => {
         return;
     }
     let profilePage = null,
-        city = null,
-        age = null;
+        city = null;
 
     // REVIEW. test to see that we dont need it
     // If not there was at least one input startsWith()
@@ -117,7 +116,8 @@ exports.addMoreInfo = (moreInfo, userId) => {
     // }
     profilePage = moreInfo.profilePage || null;
     city = moreInfo.city || city;
-    age = moreInfo.age || age;
+    // Not working with "" now...
+    let age = moreInfo.age || null;
 
     // write in the data base.
     return addUserInfo(userId, age, capitalizeFirstLetter(city), profilePage)

@@ -24,10 +24,6 @@ module.exports.getAllSignature = () => {
     return db.query(`SELECT * FROM signatures`);
 };
 
-// module.exports.getName = () => {
-//     return db.query(`SELECT first, last FROM signatures`);
-// };
-
 module.exports.getSignatureBySignatureId = (rowNum) => {
     return db.query(
         `SELECT * FROM signatures
@@ -41,9 +37,6 @@ module.exports.countSignatures = () => {
 };
 
 module.exports.addSignature = (user_id, signature) => {
-    // console.log(
-    //     `[db]Name: ${name} [db]surnmae: ${surname} signature: ${signature}`
-    // );
     const q = `INSERT INTO signatures (user_id, signature)
     VALUES ($1, $2 ) RETURNING id`;
 
@@ -52,12 +45,37 @@ module.exports.addSignature = (user_id, signature) => {
     return db.query(q, param);
 };
 
+module.exports.deleteSignatureBySignatureId = (rowNum) => {
+    return db.query(
+        `DELETE * FROM signatures
+                        WHERE id = $1`,
+        [rowNum]
+    );
+};
+
 /* ---------------------------------------------------------------
                     users TABLE
 ----------------------------------------------------------------*/
 
 module.exports.getCompleteName = () => {
     return db.query(`SELECT name, surname FROM user`);
+};
+
+module.exports.getPasswordByUserId = (userId) => {
+    return db.query(
+        `SELECT password FROM users
+        WHERE id = $1`,
+        [userId]
+    );
+};
+
+module.exports.updatePasswordByUserId = (newpass, userId) => {
+    return db.query(
+        `UPDATE users
+        SET  passwor=$1
+        WHERE id = $2`,
+        [newpass, userId]
+    );
 };
 
 module.exports.registerUser = (name, surname, email, password) => {
@@ -69,13 +87,13 @@ module.exports.registerUser = (name, surname, email, password) => {
     return db.query(q, param);
 };
 
-module.exports.updateUser = (name, surname, email, password, userId) => {
-    const q = `UPDATE users (name, surname, email, password)
-    SET name = $1, surname = $2, email = $3, password =$4  
-    WHERE id = $5`;
+module.exports.updateUser = (name, surname, email, userId) => {
+    const q = `UPDATE users
+    SET name = $1, surname = $2, email = $3  
+    WHERE id = $4`;
 
     // RETURNING all
-    const param = [name, surname, email, password, userId];
+    const param = [name, surname, email, userId];
     return db.query(q, param);
 };
 
@@ -93,8 +111,8 @@ module.exports.addUserInfo = (user_id, age, city, profilePage) => {
 module.exports.updateProfile = (user_id, age, city, profilePage) => {
     const q = ` INSERT INTO user_profiles (user_id, age, city, profilePage)
     VALUES ($1, $2, $3, $4)
-    ON CONFLICT (users_id)
-    DO UPDATE SET age=$2, city=$3,profilePage=$4`;
+    ON CONFLICT (user_id)
+    DO UPDATE SET age=$2, city=$3, profilePage=$4`;
     const param = [user_id, age, city, profilePage];
 
     return db.query(q, param);
@@ -124,7 +142,8 @@ FROM users
 RIGHT JOIN signatures
 ON signatures.user_id=users.id  
 LEFT JOIN user_profiles
-ON user_profiles.user_id=users.id`
+ON user_profiles.user_id=users.id
+ORDER BY users.surname`
     );
 };
 
@@ -136,7 +155,8 @@ RIGHT JOIN signatures
 ON signatures.user_id=users.id  
 JOIN user_profiles
 ON user_profiles.user_id=users.id
-WHERE user_profiles.city = $1`,
+WHERE user_profiles.city = $1
+ORDER BY users.surname`,
         [searchCity]
     );
 };

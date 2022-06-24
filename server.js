@@ -19,6 +19,7 @@ const {
     updateUser,
     updateProfile,
     getSignatureBySignatureId,
+    deleteSignatureBySignatureId,
 } = require("./db");
 
 const {
@@ -159,6 +160,7 @@ app.get("/signers/:city", (req, res) => {
                 title: "Signers",
                 withNavBar: true,
                 haveSign: true,
+                nameCity: req.params.city,
                 listOfSigners,
             });
         })
@@ -223,7 +225,7 @@ app.get("/configuration/signature", (req, res) => {
                 title: "Configuration",
                 haveSign: req.session.signatureId,
                 withNavBar: true,
-                signature: result.rows[0],
+                signature: result.rows[0].signature,
             });
         })
         .catch((err) => console.log("Error in config/signature", err));
@@ -374,10 +376,11 @@ app.post("/profile", (req, res) => {
 
 app.post("/configuration/profile", (req, res) => {
     console.log("req.body in config User", req.body);
-    console.log("req.session.userId ", req.session.userId);
     // First verify Password if password correct then all good.
 
     const uesrInfo = req.body;
+    console.log("uesrInfo ", uesrInfo);
+
     //  updateUser (name, surname, email, password, userId)
     // updateProfile = (user_id, age, city, profilePage)
     Promise.all([
@@ -385,7 +388,6 @@ app.post("/configuration/profile", (req, res) => {
             uesrInfo.name,
             uesrInfo.surname,
             uesrInfo.email,
-            uesrInfo.password,
             req.session.userId
         ),
         updateProfile(
@@ -399,7 +401,7 @@ app.post("/configuration/profile", (req, res) => {
         .catch((err) => {
             console.log("Erro Updating user", err);
             // REVIEW: i do sthing different.
-            window.alert("An error ocurr. Try again.");
+            // Window.alert("An error ocurr. Try again.");
             res.redirect("/configuration/profile");
         });
 
@@ -407,6 +409,30 @@ app.post("/configuration/profile", (req, res) => {
     // addMoreInfo(req.body, req.session.userId)
     //     .then(() => res.redirect("/petition"))
     //     .catch((err) => console.log("Error Profile:", err));
+});
+
+app.post("/configuration/signature", (req, res) => {
+    deleteSignatureBySignatureId(req.session.signatureId)
+        .then((result) => {
+            console.log("result.rows", result.rows);
+            req.session.signatureId = null;
+            console.log("req.session after deleting signature", req.session);
+            res.redirect("/configuration");
+        })
+        .catch((err) => console.log("Error in config/signature", err));
+});
+
+app.post("/configuration/newpassword", (req, res) => {
+    console.log("req.body:", req.body);
+    // get old password.
+
+    res.redirect("/configuration");
+});
+
+app.post("/configuration/deleteAccount", (req, res) => {
+    // Dete account.
+    req.session = null;
+    res.redirect("/home");
 });
 
 app.listen(process.env.PORT || PORT, () => {
