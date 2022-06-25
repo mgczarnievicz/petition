@@ -4,16 +4,28 @@
         <h3>In the city of: {{nameCity}}</h3>
     {{/if}}
 
-    <table>
+    <table class="signers-table">
         {{#listOfSigners}}
             <tr>
-                <td>{{name}} {{surname}} </td>
-                {{#if age}}
-                    <td>{{age}}</td>
+                {{#if profilepage}}
+                    <td class="name-cell"><a
+                            href="{{profilepage}}"
+                            target="”_blank”"
+                        >{{name}}
+                            {{surname}}</a>
+                    </td>
+
+                {{else}}
+                    <td class="name-cell">{{name}} {{surname}} </td>
+
                 {{/if}}
 
+                <td class="age-cell">{{age}}</td>
+
                 {{#if city}}
-                    <td> <a href="/signers/{{city}}">{{city}}</a> </td>
+                    <td class="city-cell">
+                        <a href="/signers/{{city}}">{{city}}</a>
+                    </td>
                 {{/if}}
 
             </tr>

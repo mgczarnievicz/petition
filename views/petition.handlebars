@@ -1,11 +1,8 @@
 <section class="petition-section section-container">
     <h1>Sign up our Petition</h1>
 
-    <div class="error">
-        {{#if error}}
-            <p>Oops! an Error has occurred. Please try again</p>
-        {{/if}}
-    </div>
+       {{>message}}
+
     <form class="petition-form form-container" method="post" action="/petition">
 
         <label for="signature-canva">Signature</label>

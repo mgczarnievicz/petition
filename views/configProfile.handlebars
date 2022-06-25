@@ -3,11 +3,7 @@
 <section class="profile-section section-container">
     <h1>Sign In</h1>
 
-    <div class="error">
-        {{#if error}}
-            <p>{{errMessage}}. Please try again</p>
-        {{/if}}
-    </div>
+    {{>message}}
 
     <form class="profile-info form-container" method="post">
         {{#user}}
@@ -39,17 +35,17 @@
             />
 
             <label for="age">Age</label>
-            <input id="age" type="number" name="age" value={{age}} />
+            <input id="age" type="number" name="age" value="{{age}}" />
 
             <label for="city">City</label>
-            <input id="city" type="text" name="city" value={{city}} />
+            <input id="city" type="text" name="city" value="{{city}}" />
 
-            <label for="homePage">Home Page</label>
+            <label for="profilePage">Profile Page</label>
             <input
-                id="homePage"
+                id="profilePage"
                 type="url"
-                name="homePage"
-                value={{homePage}}
+                name="profilePage"
+                value="{{profilepage}}"
             />
 
             {{! Here or do a nuw section this is for a new password!!! this should be empty}}

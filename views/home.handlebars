@@ -4,11 +4,8 @@
 <section class="register-section section-container">
         <h1>Sign In</h1>
 
-    <div class="error">
-        {{#if error}}
-            <p>{{errMessage}}. Please try again</p>
-        {{/if}}
-    </div>
+        {{>message}}
+
 
     <form class="register-form form-container" method="post">
 

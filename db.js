@@ -17,6 +17,58 @@ const db = spicedPg(
 );
 
 /* ---------------------------------------------------------------
+                    users TABLE
+----------------------------------------------------------------*/
+
+module.exports.getCompleteName = () => {
+    return db.query(`SELECT name, surname FROM user`);
+};
+
+module.exports.getPasswordByUserId = (userId) => {
+    return db.query(
+        `SELECT password FROM users
+        WHERE id = $1`,
+        [userId]
+    );
+};
+
+module.exports.updatePasswordByUserId = (newpass, userId) => {
+    return db.query(
+        `UPDATE users
+        SET  password=$1
+        WHERE id = $2`,
+        [newpass, userId]
+    );
+};
+
+module.exports.registerUser = (name, surname, email, password) => {
+    const q = `INSERT INTO users (name, surname, email, password)
+    VALUES ($1, $2, $3, $4 ) RETURNING id, name, surname`;
+
+    // RETURNING all
+    const param = [name, surname, email, password];
+    return db.query(q, param);
+};
+
+module.exports.updateUser = (name, surname, email, userId) => {
+    const q = `UPDATE users
+    SET name = $1, surname = $2, email = $3  
+    WHERE id = $4`;
+
+    // RETURNING all
+    const param = [name, surname, email, userId];
+    return db.query(q, param);
+};
+
+module.exports.deleteUserByUserId = (rowNum) => {
+    return db.query(
+        `DELETE FROM users
+                        WHERE id = $1`,
+        [rowNum]
+    );
+};
+
+/* ---------------------------------------------------------------
                     signatures TABLE
 ----------------------------------------------------------------*/
 
@@ -45,56 +97,20 @@ module.exports.addSignature = (user_id, signature) => {
     return db.query(q, param);
 };
 
-module.exports.deleteSignatureBySignatureId = (rowNum) => {
+module.exports.deleteSignatureBySignatureId = (signatureId) => {
     return db.query(
-        `DELETE * FROM signatures
+        `DELETE FROM signatures
                         WHERE id = $1`,
-        [rowNum]
+        [signatureId]
     );
 };
 
-/* ---------------------------------------------------------------
-                    users TABLE
-----------------------------------------------------------------*/
-
-module.exports.getCompleteName = () => {
-    return db.query(`SELECT name, surname FROM user`);
-};
-
-module.exports.getPasswordByUserId = (userId) => {
+module.exports.deleteSignatureByUserId = (userId) => {
     return db.query(
-        `SELECT password FROM users
-        WHERE id = $1`,
+        `DELETE FROM signatures
+                        WHERE user_id = $1`,
         [userId]
     );
-};
-
-module.exports.updatePasswordByUserId = (newpass, userId) => {
-    return db.query(
-        `UPDATE users
-        SET  passwor=$1
-        WHERE id = $2`,
-        [newpass, userId]
-    );
-};
-
-module.exports.registerUser = (name, surname, email, password) => {
-    const q = `INSERT INTO users (name, surname, email, password)
-    VALUES ($1, $2, $3, $4 ) RETURNING id, name, surname`;
-
-    // RETURNING all
-    const param = [name, surname, email, password];
-    return db.query(q, param);
-};
-
-module.exports.updateUser = (name, surname, email, userId) => {
-    const q = `UPDATE users
-    SET name = $1, surname = $2, email = $3  
-    WHERE id = $4`;
-
-    // RETURNING all
-    const param = [name, surname, email, userId];
-    return db.query(q, param);
 };
 
 /* ---------------------------------------------------------------
@@ -116,6 +132,14 @@ module.exports.updateProfile = (user_id, age, city, profilePage) => {
     const param = [user_id, age, city, profilePage];
 
     return db.query(q, param);
+};
+
+module.exports.deleteProfileByUserId = (rowNum) => {
+    return db.query(
+        `DELETE FROM user_profiles
+                        WHERE user_id = $1`,
+        [rowNum]
+    );
 };
 
 /* ---------------------------------------------------------------

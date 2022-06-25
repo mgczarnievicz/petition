@@ -28,19 +28,13 @@ const {
     logInVerify,
     verifyingInputs,
     addMoreInfo,
+    setNewPassword,
+    deleteUser,
 } = require("./process");
 
 const bodyParser = require("body-parser");
 
 const cookieSession = require("cookie-session");
-
-// FIXME! function not working. doing things by hand.
-function setSessionCookie(session, key, value) {
-    console.log(`key: ${key}, value: ${value}`);
-    session[key] = value;
-    console.log("Session in set function", session);
-    return;
-}
 
 app.use(
     cookieSession({
@@ -114,59 +108,9 @@ app.use((req, res, next) => {
     }
 });
 
-app.get("/petition", (req, res) => {
-    res.render("petition", {
-        title: "Petition",
-        withNavBar: true,
-        haveSign: false,
-        error: false,
-    });
-});
-
-app.get("/thanks", (req, res) => {
-    console.log("req.session.signatureId", req.session.signatureId);
-    getSignatureByIdAndTotalSigners(req.session.signatureId).then((result) => {
-        res.render("thanks", {
-            title: "Thanks",
-            withNavBar: true,
-            haveSign: true,
-            user: result[0],
-            totalSigners: result[1].count,
-        });
-    });
-});
-
-app.get("/signers", (req, res) => {
-    getSigners()
-        .then((result) => {
-            const listOfSigners = result.rows;
-            console.log("listOfSigners", listOfSigners);
-            res.render("signers", {
-                title: "Signers",
-                withNavBar: true,
-                haveSign: true,
-                listOfSigners,
-            });
-        })
-        .catch((err) => console.log("Error:", err));
-});
-
-app.get("/signers/:city", (req, res) => {
-    console.log("req.params", req.params);
-    getSignersByCity(req.params.city)
-        .then((result) => {
-            const listOfSigners = result.rows;
-            res.render("signers", {
-                title: "Signers",
-                withNavBar: true,
-                haveSign: true,
-                nameCity: req.params.city,
-                listOfSigners,
-            });
-        })
-        .catch((err) => console.log("Error:", err));
-});
-
+/*------------------------------------------------------------------------- 
+                                GET METHOD
+-------------------------------------------------------------------------*/
 app.get("/logout", (req, res) => {
     console.log("I am in Logout, we clear the cookies");
     req.session = null;
@@ -178,8 +122,7 @@ app.get("/home", (req, res) => {
         title: "Home",
         withNavBar: false,
         haveSign: false,
-        error: false,
-        errMessage: "",
+        errorMessage: false,
     });
 });
 
@@ -188,12 +131,81 @@ app.get("/login", (req, res) => {
         title: "Login",
         withNavBar: false,
         haveSign: false,
-        error: false,
+        errorMessage: false,
     });
 });
 
+app.get("/profile", (req, res) => {
+    res.render("moreInfo", {
+        title: "Profile",
+        withNavBar: true,
+        haveSign: false,
+        errorMessage: false,
+    });
+});
+
+app.get("/petition", (req, res) => {
+    res.render("petition", {
+        title: "Petition",
+        withNavBar: true,
+        haveSign: false,
+        errorMessage: false,
+    });
+});
+
+app.get("/thanks", (req, res) => {
+    console.log("req.session.signatureId", req.session.signatureId);
+    getSignatureByIdAndTotalSigners(req.session.signatureId)
+        .then((result) => {
+            res.render("thanks", {
+                title: "Thanks",
+                withNavBar: true,
+                haveSign: true,
+                user: result[0],
+                totalSigners: result[1].count,
+            });
+        })
+        .catch(() =>
+            res.render("petition", {
+                title: "petition",
+                withNavBar: true,
+                haveSign: req.session.signatureId,
+                errorMessage: "Oops! an Error has occurred.",
+            })
+        );
+});
+
+app.get("/signers", (req, res) => {
+    getSigners()
+        .then((result) => {
+            res.render("signers", {
+                title: "Signers",
+                withNavBar: true,
+                haveSign: true,
+                listOfSigners: result.rows,
+            });
+        })
+        // REVIEW: VER QUE PASA EN CASO DE ERROR EN ESE CASO!
+        .catch((err) => console.log("Error:", err));
+});
+
+app.get("/signers/:city", (req, res) => {
+    console.log("req.params", req.params);
+    getSignersByCity(req.params.city)
+        .then((result) => {
+            res.render("signers", {
+                title: "Signers",
+                withNavBar: true,
+                haveSign: true,
+                nameCity: req.params.city,
+                listOfSigners: result.rows,
+            });
+        })
+        // REVIEW: VER QUE PASA EN CASO DE ERROR EN ESE CASO!
+        .catch((err) => console.log("Error:", err));
+});
+
 app.get("/configuration", (req, res) => {
-    // This can not be done, any numbre is singatureId exist is truthy.
     res.render("configuration", {
         title: "Configuration",
         withNavBar: true,
@@ -204,16 +216,16 @@ app.get("/configuration", (req, res) => {
 app.get("/configuration/profile", (req, res) => {
     getUserInformationById(req.session.userId)
         .then((result) => {
-            console.log("result.rows", result.rows[0]);
-
+            console.log("result.rows[0]", result.rows[0]);
             res.render("configProfile", {
                 title: "Configuration",
                 withNavBar: true,
                 haveSign: req.session.signatureId,
-                error: false,
+                errorMessage: false,
                 user: result.rows[0],
             });
         })
+        // REVIEW: VER QUE PASA EN CASO DE ERROR EN ESE CASO!
         .catch((err) => console.log("Error getUserInformationById:", err));
 });
 
@@ -228,6 +240,7 @@ app.get("/configuration/signature", (req, res) => {
                 signature: result.rows[0].signature,
             });
         })
+        // REVIEW: VER QUE PASA EN CASO DE ERROR EN ESE CASO!
         .catch((err) => console.log("Error in config/signature", err));
 });
 
@@ -247,84 +260,52 @@ app.get("/configuration/deleteAccount", (req, res) => {
     });
 });
 
-app.get("/profile", (req, res) => {
-    res.render("moreInfo", {
-        title: "Profile",
-        withNavBar: true,
-        haveSign: false,
-        error: false,
-    });
-});
-
-// POST in pettion is missing.
-app.post("/petition", (req, res) => {
-    console.log("Getting info of pettion");
-    addSignature(req.session.userId, req.body.signature)
-        .then((result) => {
-            // setSessionCookie(req.session, signatureId, result.rows[0].id);
-            req.session.signatureId = result.rows[0].id;
-            res.redirect("/thanks");
-        })
-        .catch((err) => {
-            console.log("Error:", err);
-            res.render("petition", {
-                title: "Petition",
-                withNavBar: true,
-                haveSign: req.session.signatureId,
-                error: true,
-            });
-        });
-});
+/*------------------------------------------------------------------------- 
+                            POST METHOD
+-------------------------------------------------------------------------*/
 
 app.post("/home", (req, res) => {
     console.log("Getting Home info");
     console.log("req.body", req.body);
     // Verify the empty Strings!   Empty inputs are not valids"
     if (!verifyingInputs(req.body)) {
-        // Error
         res.render("home", {
             title: "Home",
             withNavBar: false,
             haveSign: false,
-            error: true,
-            errMessage: "Empty inputs are not valids",
+            errorMessage: "Empty inputs are not valids.",
         });
     } else {
         registerNewUser(req.body)
             .then((currentUser) => {
                 console.log("currentUser", currentUser);
-                // setSessionCookie(req.session, userId, currentUser.id);
                 req.session.userId = currentUser.id;
                 res.redirect("/profile");
             })
-            .catch((err) =>
+            .catch(() =>
                 res.render("home", {
                     title: "Home",
                     withNavBar: false,
                     haveSign: false,
-                    error: true,
-                    errMessage: "Oops! an Error has occurred",
+                    errorMessage: "Oops! an Error has occurred.",
                 })
             );
     }
 });
 
 app.post("/login", (req, res) => {
-    console.log("Inmedianto req.body", req.body);
     logInVerify(req.body)
         .then((userLogIn) => {
-            console.log("userLogIn", userLogIn);
+            console.log("userLogIn:", userLogIn);
             if (typeof userLogIn === "string") {
                 res.render("logIn", {
                     title: "Login",
                     withNavBar: false,
                     haveSign: false,
-                    error: false,
-                    errorFiled: userLogIn,
+                    errorMessage: userLogIn,
                 });
             } else {
                 console.log("userLogIn not a string");
-                // setSessionCookie(req.session, userId, userLogIn[0].id);
                 req.session.userId = userLogIn.id;
 
                 if (userLogIn.signatureId) {
@@ -341,8 +322,7 @@ app.post("/login", (req, res) => {
                 title: "Login",
                 withNavBar: false,
                 haveSign: false,
-                error: false,
-                errorFiled: "Oops! an Error has occurred",
+                errorMessage: "Oops! an Error has occurred.",
             });
         });
 });
@@ -351,7 +331,6 @@ app.post("/petition", (req, res) => {
     console.log("Getting info of pettion");
     addSignature(req.session.userId, req.body.signature)
         .then((result) => {
-            // setSessionCookie(req.session, signatureId, result.rows[0].id);
             req.session.signatureId = result.rows[0].id;
             res.redirect("/thanks");
         })
@@ -361,17 +340,24 @@ app.post("/petition", (req, res) => {
                 title: "Petition",
                 withNavBar: true,
                 haveSign: req.session.signatureId,
-                error: true,
+                errorMessage: "Oops! an Error has occurred.",
             });
         });
 });
 
 app.post("/profile", (req, res) => {
     console.log("req.body", req.body);
-    console.log("req.session.userId ", req.session.userId);
     addMoreInfo(req.body, req.session.userId)
         .then(() => res.redirect("/petition"))
-        .catch((err) => console.log("Error Profile:", err));
+        .catch((err) => {
+            console.log("Error Profile:", err);
+            res.render("moreInfo", {
+                title: "Profile",
+                withNavBar: true,
+                haveSign: req.session.signatureId,
+                errorMessage: "Oops! an Error has occurred.",
+            });
+        });
 });
 
 app.post("/configuration/profile", (req, res) => {
@@ -379,7 +365,6 @@ app.post("/configuration/profile", (req, res) => {
     // First verify Password if password correct then all good.
 
     const uesrInfo = req.body;
-    console.log("uesrInfo ", uesrInfo);
 
     //  updateUser (name, surname, email, password, userId)
     // updateProfile = (user_id, age, city, profilePage)
@@ -400,9 +385,12 @@ app.post("/configuration/profile", (req, res) => {
         .then(() => res.redirect("/configuration"))
         .catch((err) => {
             console.log("Erro Updating user", err);
-            // REVIEW: i do sthing different.
-            // Window.alert("An error ocurr. Try again.");
-            res.redirect("/configuration/profile");
+            res.render("configProfile", {
+                title: "Configuration",
+                withNavBar: true,
+                haveSign: req.session.signatureId,
+                errorMessage: "Oops! an Error has occurred.",
+            });
         });
 
     //If not, not save changes.
@@ -413,26 +401,61 @@ app.post("/configuration/profile", (req, res) => {
 
 app.post("/configuration/signature", (req, res) => {
     deleteSignatureBySignatureId(req.session.signatureId)
-        .then((result) => {
-            console.log("result.rows", result.rows);
+        .then(() => {
             req.session.signatureId = null;
-            console.log("req.session after deleting signature", req.session);
             res.redirect("/configuration");
         })
-        .catch((err) => console.log("Error in config/signature", err));
+        .catch(() =>
+            res.render("signature", {
+                title: "Configuration",
+                withNavBar: true,
+                haveSign: req.session.signatureId,
+                errorMessage: "Oops! an Error has occurred.",
+            })
+        );
 });
 
 app.post("/configuration/newpassword", (req, res) => {
     console.log("req.body:", req.body);
     // get old password.
-
-    res.redirect("/configuration");
+    setNewPassword(req.session.userId, req.body.old, req.body.new)
+        .catch(() =>
+            res.render("newPassword", {
+                title: "Configuration",
+                withNavBar: true,
+                haveSign: req.session.signatureId,
+                errorMessage: "Oops! an Error has occurred.",
+            })
+        )
+        .then(() => {
+            res.redirect("/configuration");
+        });
 });
 
 app.post("/configuration/deleteAccount", (req, res) => {
     // Dete account.
-    req.session = null;
-    res.redirect("/home");
+    deleteUser(req.session.userId, req.body.password)
+        .then((result) => {
+            if (typeof result === "string") {
+                res.render("deleteAccount", {
+                    title: "Configuration",
+                    withNavBar: true,
+                    haveSign: req.session.signatureId,
+                    errorMessage: result,
+                });
+            } else {
+                req.session = null;
+                res.redirect("/home");
+            }
+        })
+        .catch(() =>
+            res.render("deleteAccount", {
+                title: "Configuration",
+                withNavBar: true,
+                haveSign: req.session.signatureId,
+                errorMessage: "Oops! an Error has occurred.",
+            })
+        );
 });
 
 app.listen(process.env.PORT || PORT, () => {

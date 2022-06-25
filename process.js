@@ -1,10 +1,14 @@
 const {
-    getUserById,
     countSignatures,
     registerUser,
     getUserByEmail,
     addUserInfo,
     getSignatureBySignatureId,
+    getPasswordByUserId,
+    updatePasswordByUserId,
+    deleteUserByUserId,
+    deleteProfileByUserId,
+    deleteSignatureByUserId,
 } = require("./db");
 
 const bcrypt = require("./encryption");
@@ -20,6 +24,19 @@ function allStringsAreEmpty(obj) {
         }
     }
     return true;
+}
+
+function compareInputAndSavedPassByUserId(userId, inputPass) {
+    return getPasswordByUserId(userId)
+        .catch((err) => err)
+        .then((result) => {
+            console.log("results in set new pass:", result.rows[0].password);
+
+            return bcrypt
+                .compare(inputPass, result.rows[0].password)
+                .catch((err) => err)
+                .then((isCorrect) => isCorrect);
+        });
 }
 
 module.exports.getSignatureByIdAndTotalSigners = (signatureId) => {
@@ -85,7 +102,6 @@ exports.logInVerify = (userLogIn) => {
                         console.log("You Are In!");
                         return result.rows[0];
                     } else {
-                        console.log("Password Incorrect");
                         return "Password Incorrect";
                     }
                 });
@@ -93,34 +109,81 @@ exports.logInVerify = (userLogIn) => {
 };
 
 exports.addMoreInfo = (moreInfo, userId) => {
-    if (allStringsAreEmpty(moreInfo)) {
-        // All input are empty so we dont save
-        return;
-    }
-    let profilePage = null,
-        city = null;
+    return new Promise((resolve, reject) => {
+        if (allStringsAreEmpty(moreInfo)) {
+            // All input are empty so we dont save
+            resolve();
+        }
 
-    // REVIEW. test to see that we dont need it
-    // If not there was at least one input startsWith()
-    // capitalizeFirstLetter
-    // if (moreInfo.profilePage.length != 0) {
-    //     profilePage = moreInfo.profilePage;
-    //     console.log("profilePage", profilePage);
-    //     if (
-    //         profilePage.startsWith("http://") ||
-    //         profilePage.startsWith("https://") ||
-    //         profilePage.startsWith("//")
-    //     ) {
-    //         return "Profile Page Not accepted.";
-    //     }
-    // }
-    profilePage = moreInfo.profilePage || null;
-    city = moreInfo.city || city;
-    // Not working with "" now...
-    let age = moreInfo.age || null;
+        // REVIEW. test to see that we dont need it
+        // If not there was at least one input startsWith()
+        // capitalizeFirstLetter
+        // if (moreInfo.profilePage.length != 0) {
+        //     profilePage = moreInfo.profilePage;
+        //     console.log("profilePage", profilePage);
+        //     if (
+        //         profilePage.startsWith("http://") ||
+        //         profilePage.startsWith("https://") ||
+        //         profilePage.startsWith("//")
+        //     ) {
+        //         return "Profile Page Not accepted.";
+        //     }
+        // }
+        const profilePage = moreInfo.profilePage || null;
+        const city = moreInfo.city || null;
+        // Not working with "" now...
+        let age = moreInfo.age || null;
 
-    // write in the data base.
-    return addUserInfo(userId, age, capitalizeFirstLetter(city), profilePage)
-        .then((result) => result)
+        // write in the data base.
+        return addUserInfo(
+            userId,
+            age,
+            capitalizeFirstLetter(city),
+            profilePage
+        )
+            .then((result) => resolve(result))
+            .catch((err) => reject(err));
+    });
+};
+
+exports.setNewPassword = (userId, oldPassword, newPassword) => {
+    return compareInputAndSavedPassByUserId(userId, oldPassword)
+        .then((isCorrect) => {
+            if (isCorrect) {
+                console.log("You Are In!");
+                // hash new password and save it.
+                return (
+                    bcrypt
+                        .hash(newPassword)
+                        //
+                        .then((hashpass) => {
+                            // Saved input in the db.
+                            console.log("hashpass", hashpass);
+                            return updatePasswordByUserId(hashpass, userId);
+                        })
+                        .catch((err) => err)
+                );
+            } else {
+                return "Password Incorrect";
+            }
+        })
+        .catch((err) => err);
+};
+
+exports.deleteUser = (userId, password) => {
+    return compareInputAndSavedPassByUserId(userId, password)
+        .then((isCorrect) => {
+            if (isCorrect) {
+                console.log("Pass correct");
+                return Promise.all([
+                    deleteProfileByUserId(userId),
+                    deleteSignatureByUserId(userId),
+                ])
+                    .then(() => deleteUserByUserId(userId))
+                    .catch((err) => err);
+            } else {
+                return "Password Incorrect";
+            }
+        })
         .catch((err) => err);
 };

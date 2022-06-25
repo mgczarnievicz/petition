@@ -1,11 +1,8 @@
 <section class="profile-section section-container">
     <h1>Tell us more about you</h1>
 
-    <div class="error">
-        {{#if error}}
-            <p>{{errMessage}}. Please try again</p>
-        {{/if}}
-    </div>
+        {{>message}}
+
 
     <form class="profile-info form-container" method="post">
 
@@ -15,7 +12,7 @@
         <label for="city">City</label>
         <input id="city" type="text" name="city" />
 
-        <label for="profilePage">Home Page</label>
+        <label for="profilePage">Profile Page</label>
         <input id="profilePage" type="url" name="profilePage" />
 
         <div class="buttons-container">

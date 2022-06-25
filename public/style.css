@@ -152,14 +152,21 @@ nav a:hover {
 .signers-section {
     text-align: center;
 }
-.signers-section li {
-    margin-bottom: 25px;
-}
+
 .signers-section h1 {
     margin: 10px;
 }
 .signers-section p {
     margin: 5px;
+}
+
+.signers-section .age-cell {
+    padding: 0 30px;
+}
+
+.signers-section a {
+    text-decoration: none;
+    color: black;
 }
 
 /* -----------------------------------------------------------------------
