@@ -8,8 +8,9 @@
 
     </head>
     <body>
-        <header>
-            {{#if withNavBar}}
+        {{#if withNavBar}}
+
+            <header>
                 <nav>
                     {{! PUT HERE THE LINKS WHEN YOU ARE ALREDY LOG IN ! 
                 SEE IF THIS IS WORTH IT PUTTING IT HERE OR IN EACH PAGE DEPENDING 
@@ -26,9 +27,10 @@
                     <a href="/logout">Log Out</a>
 
                 </nav>
-            {{/if}}
 
-        </header>
+            </header>
+        {{/if}}
+
         <main>
             {{{body}}}
 

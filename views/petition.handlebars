@@ -1,3 +1,6 @@
+{{> information}}
+
+
 <section class="petition-section section-container">
     <h1>Sign up our Petition</h1>
 
@@ -5,9 +8,9 @@
 
     <form class="petition-form form-container" method="post" action="/petition">
 
-        <label for="signature-canva">Signature</label>
+        <label for="signature-canva" hidden >Signature</label>
         <input id="signature" type="hidden" name="signature" />
-        <canvas width="350" height="100" id="signature-canva"></canvas>
+        <canvas width="450" height="200" id="signature-canva"></canvas>
 
         <div class="buttons-container">
             <button type="submit" id="button-submit">Submit</button>

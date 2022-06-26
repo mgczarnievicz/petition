@@ -1,17 +1,26 @@
+{{> information}}
+
 <section class="deleteAccount-section section-container">
 
-    <form class="form-container" method="post">
+    <div class="inside-container config-container">
 
-        <h3>Are you sure that you want to delete your Account</h3>
-
+        <h1>Are you sure that you want to delete your Account?</h1>
         <p>Confirm your Password to DELETE Account.</p>
-        <label for="password">Password</label>
-        <input id="password" type="password" name="password" required />
 
-        <div class="buttons-container">
-            <button type="submit">Confirm</button>
-            <a href="/configuration" class="likeButton">Cancel</a>
-        </div>
+        {{>message}}
 
-    </form>
+
+        <form class="form-container config-form" method="post">
+
+            <label for="password">Password</label>
+            <input id="password" type="password" name="password" required />
+
+            <div class="buttons-container">
+                <button type="submit">Confirm</button>
+                <a href="/configuration" class="likeButton">Cancel</a>
+            </div>
+
+        </form>
+    </div>
+
 </section>

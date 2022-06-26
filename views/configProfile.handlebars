@@ -1,65 +1,69 @@
 {{! Show data from the person! }}
+{{!-- {{> products}} --}}
+
 
 <section class="profile-section section-container">
-    <h1>Sign In</h1>
 
-    {{>message}}
+    <div class="profile-container inside-container">
+        <h1>Profile</h1>
 
-    <form class="profile-info form-container" method="post">
-        {{#user}}
-            <label for="name">Name</label>
-            <input
-                id="name"
-                type="text"
-                name="name"
-                value="{{name}}"
-                required
-            />
+        {{>message}}
 
-            <label for="surname">Surname</label>
-            <input
-                id="surname"
-                type="text"
-                name="surname"
-                value="{{surname}}"
-                required
-            />
+        <form class="profile-info form-container" method="post">
+            {{#user}}
+                <label for="name">Name</label>
+                <input
+                    id="name"
+                    type="text"
+                    name="name"
+                    value="{{name}}"
+                    required
+                />
 
-            <label for="email">E-mail</label>
-            <input
-                id="email"
-                type="email"
-                name="email"
-                value="{{email}}"
-                required
-            />
+                <label for="surname">Surname</label>
+                <input
+                    id="surname"
+                    type="text"
+                    name="surname"
+                    value="{{surname}}"
+                    required
+                />
 
-            <label for="age">Age</label>
-            <input id="age" type="number" name="age" value="{{age}}" />
+                <label for="email">E-mail</label>
+                <input
+                    id="email"
+                    type="email"
+                    name="email"
+                    value="{{email}}"
+                    required
+                />
 
-            <label for="city">City</label>
-            <input id="city" type="text" name="city" value="{{city}}" />
+                <label for="age">Age</label>
+                <input id="age" type="number" name="age" value="{{age}}" />
 
-            <label for="profilePage">Profile Page</label>
-            <input
-                id="profilePage"
-                type="url"
-                name="profilePage"
-                value="{{profilepage}}"
-            />
+                <label for="city">City</label>
+                <input id="city" type="text" name="city" value="{{city}}" />
 
-            {{! Here or do a nuw section this is for a new password!!! this should be empty}}
-            <p>Confirm Password to save changes.</p>
-            <label for="password">Password</label>
-            <input id="password" type="password" name="password" required />
+                <label for="profilePage">Profile Page</label>
+                <input
+                    id="profilePage"
+                    type="url"
+                    name="profilePage"
+                    value="{{profilepage}}"
+                />
 
-        {{/user}}
+                {{! Here or do a nuw section this is for a new password!!! this should be empty}}
+                <p>Confirm Password to save changes.</p>
+                <label for="password">Password</label>
+                <input id="password" type="password" name="password" required />
 
-        <div class="buttons-container">
-            <button type="submit">Save Changes</button>
-            <a href="/configuration" class="likeButton">Back</a>
+            {{/user}}
 
-        </div>
-    </form>
+            <div class="buttons-container">
+                <button type="submit">Save Changes</button>
+                <a href="/configuration" class="likeButton">Back</a>
+            </div>
 
+        </form>
+    </div>
 </section>

@@ -5,11 +5,18 @@
     font-family: Arial, Helvetica, sans-serif;
 }
 
+:root {
+    --color-dark: rgb(33, 28, 90);
+    --color-light: rgba(110, 182, 218, 0.563);
+    --color-hover: rgb(231, 235, 116);
+}
+
 /* -----------------------------------------------------------------------
                         General Section
 --------------------------------------------------------------------------*/
 body {
-    background-color: rgb(203, 181, 224);
+    background-color: var(--color-light);
+
     display: flex;
     flex-direction: column;
     min-height: 100vh;
@@ -17,7 +24,7 @@ body {
 header {
     width: 100%;
     height: 50px;
-    background-color: rgb(65, 33, 95);
+    background-color: var(--color-dark);
 }
 main {
     width: 100%;
@@ -30,6 +37,10 @@ main {
 footer {
     width: 100%;
     height: 30px;
+    background-color: var(--color-dark);
+    color: antiquewhite;
+    padding: 0.5%;
+    font-size: 12px;
 }
 
 nav {
@@ -39,6 +50,17 @@ nav {
     padding: 0 10px;
 }
 
+h1,
+h2,
+h3 {
+    margin: 5px 0;
+    width: 100%;
+}
+
+p {
+    line-height: 28px;
+    width: 100%;
+}
 /* -----------------------------------------------------------------------
                         Navbar
 --------------------------------------------------------------------------*/
@@ -56,21 +78,130 @@ nav a:hover {
 /* -----------------------------------------------------------------------
                         Information Section
 --------------------------------------------------------------------------*/
-.info-seccion {
+.left-section {
     max-width: 50%;
-    padding: 20px;
+    padding: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
 }
 
+.info-seccion,
+.product-section {
+    background-image: url("http://i0.wp.com/ytimg.googleusercontent.com/vi/ss7fz91syQo/maxresdefault.jpg?resize=160,120");
+    background-repeat: no-repeat;
+    background-size: cover;
+}
+
+.info-container {
+    width: 80%;
+    background-color: white;
+    border-radius: 12px;
+    padding: 5%;
+}
+
+.info-container .info-center {
+    margin-top: 62px;
+    text-align: center;
+}
+
+.img-info {
+    margin-top: 10px;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+.img-info img {
+    width: 200px;
+    object-fit: fill;
+}
+
+/* -----------------------------------------------------------------------
+                        Products Section
+--------------------------------------------------------------------------*/
+/* .product-section {
+    background-color: var(--color-hover);
+} */
+
+.products-container {
+    max-width: 95%;
+    padding: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.product-section img {
+    width: 150px;
+    height: 150px;
+    object-fit: scale-down;
+    background-color: white;
+
+    border-radius: 50%;
+    margin: 10px;
+    border: 2px solid var(--color-dark);
+}
+
+.product-section p {
+    text-align: center;
+    font-size: medium;
+    font-weight: 600;
+    border-radius: 12px;
+    background: rgb(255, 255, 255);
+    background: linear-gradient(
+        90deg,
+        rgba(255, 255, 255, 0) 0%,
+        rgba(255, 255, 255, 1) 50%,
+        rgba(254, 254, 254, 0) 100%
+    );
+}
+
+.product-section h1 {
+    text-align: center;
+    border-radius: 12px;
+    width: 100%;
+    padding: 10px;
+    background: rgb(255, 255, 255);
+    background: linear-gradient(
+        90deg,
+        rgba(255, 255, 255, 0) 0%,
+        rgba(255, 255, 255, 1) 50%,
+        rgba(254, 254, 254, 0) 100%
+    );
+}
 /* -----------------------------------------------------------------------
                         Log In Section
 --------------------------------------------------------------------------*/
 .section-container {
-    flex-grow: 4;
+    flex-grow: 3;
     min-height: 100px;
     display: flex;
     flex-direction: column;
     align-items: center;
-    padding-top: 20px;
+    padding: 2% 0px;
+}
+
+.section-container h1 {
+    width: 100%;
+    text-align: center;
+    margin: 9px 0px 30px 0px;
+    font-size: 35px;
+}
+
+.section-container p {
+    text-align: center;
+}
+
+.inside-container {
+    width: 80%;
+    padding: 5% 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    border: 10px double whitesmoke;
+    border-radius: 12px;
 }
 
 .form-container {
@@ -81,25 +212,25 @@ nav a:hover {
 }
 
 .form-container input {
-    /* width: 80%; */
     height: 25px;
     border: none;
     border-radius: 4px;
-    border-bottom: 2.5px solid rgb(164, 100, 224);
-    margin-bottom: 10px;
+    border-bottom: 2.5px solid var(--color-dark);
+    margin-bottom: 20px;
+    margin-top: 4px;
 }
 
-.petition-form canvas {
+.section-container canvas {
     background-color: aliceblue;
     border-radius: 10px;
     margin-bottom: 10px;
     cursor: pointer;
-
     align-self: center;
 }
 
 .form-container .buttons-container {
     text-align: center;
+    margin-top: 20px;
 }
 
 .form-container button,
@@ -107,7 +238,12 @@ nav a:hover {
     height: 35px;
     width: 150px;
     border-radius: 9px;
-    border: 1.5 solid rgb(164, 100, 224);
+    border: 1.5 solid;
+    border-color: var(--color-dark);
+}
+
+.form-container button {
+    margin-right: 50px;
 }
 
 .buttons-container .likeButton {
@@ -133,6 +269,15 @@ nav a:hover {
 }
 
 /* -----------------------------------------------------------------------
+                        Profile Section
+--------------------------------------------------------------------------*/
+
+.profile-section a {
+    width: 100%;
+    text-align: center;
+}
+
+/* -----------------------------------------------------------------------
                         Thanks Section
 --------------------------------------------------------------------------*/
 .thanks-section {
@@ -140,6 +285,10 @@ nav a:hover {
 }
 .thanks-section h1 {
     margin: 10px;
+}
+
+.thanks-section h3 {
+    margin: 20px;
 }
 
 .thanks-section ul {
@@ -153,15 +302,21 @@ nav a:hover {
     text-align: center;
 }
 
-.signers-section h1 {
-    margin: 10px;
-}
-.signers-section p {
-    margin: 5px;
+.signers-section .signers-table {
+    width: 80%;
 }
 
 .signers-section .age-cell {
     padding: 0 30px;
+}
+
+.signers-table td {
+    font-size: 20px;
+    padding: 10px;
+}
+
+.signers-section h2 {
+    margin-bottom: 20px;
 }
 
 .signers-section a {
@@ -204,4 +359,90 @@ nav a:hover {
 
 .config-tag {
     margin: 8px 0;
+}
+
+/* -----------------------------------------------------------------------
+                        Profile Configuration Section
+--------------------------------------------------------------------------*/
+
+.profile-container {
+    width: 60%;
+    padding: 2% 0px;
+}
+
+/* -----------------------------------------------------------------------
+                        Signature Configuration Section
+--------------------------------------------------------------------------*/
+.signature-section h3 {
+    text-align: center;
+}
+
+/* -----------------------------------------------------------------------
+                        Delete Account Configuration Section
+--------------------------------------------------------------------------*/
+
+.deleteAccount-section h1 {
+    font-size: 25px;
+}
+
+.deleteAccount-section p {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.config-form {
+    width: 90%;
+    margin-top: 25px;
+}
+
+.config-container {
+    width: 90%;
+    min-height: 400px;
+}
+/* -----------------------------------------------------------------------
+                        Media Query
+--------------------------------------------------------------------------*/
+
+@media screen and (min-height: 600px) {
+    .info-container .info-center {
+        margin-top: 130px;
+    }
+    .product-section img {
+        width: 200px;
+        height: 200px;
+        object-fit: scale-down;
+    }
+
+    .section-container {
+        padding-top: 7%;
+    }
+    .table-container {
+        width: 80%;
+    }
+
+    .profile-section,
+    .newPassword-section,
+    .deleteAccount-section,
+    .signers-section,
+    .signature-section {
+        padding-top: 2%;
+    }
+
+    .info-seccion {
+        align-items: flex-start;
+        justify-content: center;
+    }
+    .info-container {
+        margin-top: 10%;
+    }
+    .products-container {
+        min-height: 750px;
+    }
+    .config-container {
+        min-height: 600px;
+    }
+    .left-section {
+        max-width: 55%;
+        padding: 20px;
+    }
 }

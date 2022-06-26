@@ -1,7 +1,13 @@
+{{> products}}
+
+
 <section class="signers-section section-container">
+
+<div class="inside-container  config-container table-container">
+
     <h1>List of the singers</h1>
     {{#if nameCity}}
-        <h3>In the city of: {{nameCity}}</h3>
+        <h2>In the city of: {{nameCity}}</h2>
     {{/if}}
 
     <table class="signers-table">
@@ -32,5 +38,6 @@
         {{/listOfSigners}}
 
     </table>
+        </div>
 
 </section>

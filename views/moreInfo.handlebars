@@ -1,24 +1,36 @@
+{{> products}}
+
+
 <section class="profile-section section-container">
-    <h1>Tell us more about you</h1>
 
-        {{>message}}
+    <div class="inside-container config-container">
+
+        <h1>Tell us more about you</h1>
+
+            {{>message}}
 
 
-    <form class="profile-info form-container" method="post">
+        <form class="profile-info form-container" method="post">
 
-        <label for="age">Age</label>
-        <input id="age" type="number" name="age" />
+            <label for="age">Age</label>
+            <input id="age" type="number" name="age" />
 
-        <label for="city">City</label>
-        <input id="city" type="text" name="city" />
+            <label for="city">City</label>
+            <input id="city" type="text" name="city" />
 
-        <label for="profilePage">Profile Page</label>
-        <input id="profilePage" type="url" name="profilePage" />
+            <label for="profilePage">Profile Page</label>
+            <input id="profilePage" type="url" name="profilePage" />
 
-        <div class="buttons-container">
-            <button type="submit">Save Changes</button>
-        </div>
-    </form>
-    <a href="/petition">Skip this</a>
+            <div class="buttons-container">
+                <button type="submit">Save Changes</button>
+                 <a href="/petition">Skip this</a>
+
+
+            </div>
+
+        </form>
+
+    </div>
+
 
 </section>

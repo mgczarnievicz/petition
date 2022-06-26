@@ -30,6 +30,7 @@ const {
     addMoreInfo,
     setNewPassword,
     deleteUser,
+    validateProfileInputs,
 } = require("./process");
 
 const bodyParser = require("body-parser");
@@ -157,6 +158,7 @@ app.get("/thanks", (req, res) => {
     console.log("req.session.signatureId", req.session.signatureId);
     getSignatureByIdAndTotalSigners(req.session.signatureId)
         .then((result) => {
+            console.log("lo que mando a thanks:", result[0]);
             res.render("thanks", {
                 title: "Thanks",
                 withNavBar: true,
@@ -216,7 +218,6 @@ app.get("/configuration", (req, res) => {
 app.get("/configuration/profile", (req, res) => {
     getUserInformationById(req.session.userId)
         .then((result) => {
-            console.log("result.rows[0]", result.rows[0]);
             res.render("configProfile", {
                 title: "Configuration",
                 withNavBar: true,
@@ -329,74 +330,115 @@ app.post("/login", (req, res) => {
 
 app.post("/petition", (req, res) => {
     console.log("Getting info of pettion");
-    addSignature(req.session.userId, req.body.signature)
-        .then((result) => {
-            req.session.signatureId = result.rows[0].id;
-            res.redirect("/thanks");
-        })
-        .catch((err) => {
-            console.log("Error:", err);
-            res.render("petition", {
-                title: "Petition",
-                withNavBar: true,
-                haveSign: req.session.signatureId,
-                errorMessage: "Oops! an Error has occurred.",
-            });
+    // REVIEW: SEE VERIFY THAT SIGNATURE IS NOT EMPTY!
+    if (req.body.signature == "") {
+        res.render("petition", {
+            title: "Petition",
+            withNavBar: true,
+            haveSign: req.session.signatureId,
+            errorMessage: "Signature is missing.",
         });
+    } else {
+        addSignature(req.session.userId, req.body.signature)
+            .then((result) => {
+                req.session.signatureId = result.rows[0].id;
+                res.redirect("/thanks");
+            })
+            .catch((err) => {
+                console.log("Error:", err);
+                res.render("petition", {
+                    title: "Petition",
+                    withNavBar: true,
+                    haveSign: req.session.signatureId,
+                    errorMessage: "Oops! an Error has occurred.",
+                });
+            });
+    }
 });
 
 app.post("/profile", (req, res) => {
     console.log("req.body", req.body);
-    addMoreInfo(req.body, req.session.userId)
-        .then(() => res.redirect("/petition"))
-        .catch((err) => {
-            console.log("Error Profile:", err);
-            res.render("moreInfo", {
-                title: "Profile",
-                withNavBar: true,
-                haveSign: req.session.signatureId,
-                errorMessage: "Oops! an Error has occurred.",
-            });
+    if (!verifyingInputs(req.body)) {
+        res.render("moreInfo", {
+            title: "Profile",
+            withNavBar: true,
+            haveSign: req.session.signatureId,
+            errorMessage:
+                "Empty inputs are not valids. Complete or Press Skip this.",
         });
+    } else {
+        addMoreInfo(req.body, req.session.userId)
+            .then(() => res.redirect("/petition"))
+            .catch((err) => {
+                console.log("Error Profile:", err);
+                res.render("moreInfo", {
+                    title: "Profile",
+                    withNavBar: true,
+                    haveSign: req.session.signatureId,
+                    errorMessage: "Oops! an Error has occurred.",
+                });
+            });
+    }
 });
 
 app.post("/configuration/profile", (req, res) => {
     console.log("req.body in config User", req.body);
     // First verify Password if password correct then all good.
+    let uesrInfo = (({ name, surname, email }) => ({ name, surname, email }))(
+        req.body
+    );
+    let profileObj = (({ age, city, profilePage }) => ({
+        age,
+        city,
+        profilePage,
+    }))(req.body);
 
-    const uesrInfo = req.body;
+    // const uesrInfo = req.body;
+    console.log("New uesrInfo", uesrInfo);
+    console.log("New profileObj", profileObj);
 
-    //  updateUser (name, surname, email, password, userId)
-    // updateProfile = (user_id, age, city, profilePage)
-    Promise.all([
-        updateUser(
-            uesrInfo.name,
-            uesrInfo.surname,
-            uesrInfo.email,
-            req.session.userId
-        ),
-        updateProfile(
-            req.session.userId,
-            uesrInfo.age,
-            uesrInfo.city,
-            uesrInfo.profilePage
-        ),
-    ])
-        .then(() => res.redirect("/configuration"))
-        .catch((err) => {
-            console.log("Erro Updating user", err);
-            res.render("configProfile", {
-                title: "Configuration",
-                withNavBar: true,
-                haveSign: req.session.signatureId,
-                errorMessage: "Oops! an Error has occurred.",
-            });
+    if (!verifyingInputs(uesrInfo)) {
+        res.render("configProfile", {
+            title: "Configuration",
+            withNavBar: true,
+            haveSign: req.session.signatureId,
+            errorMessage: "Name, Surname and Email must be complete.",
         });
+    } else {
+        const profileObjCl = validateProfileInputs(profileObj);
 
-    //If not, not save changes.
-    // addMoreInfo(req.body, req.session.userId)
-    //     .then(() => res.redirect("/petition"))
-    //     .catch((err) => console.log("Error Profile:", err));
+        //  updateUser (name, surname, email, password, userId)
+        // updateProfile = (user_id, age, city, profilePage)
+        Promise.all([
+            updateUser(
+                uesrInfo.name,
+                uesrInfo.surname,
+                uesrInfo.email,
+                req.session.userId
+            ),
+            updateProfile(
+                req.session.userId,
+                profileObjCl.age,
+                profileObjCl.city,
+                profileObjCl.profilePage
+            ),
+        ])
+            .then(() => res.redirect("/configuration"))
+            .catch((err) => {
+                console.log("Erro Updating user", err);
+                res.render("configProfile", {
+                    title: "Configuration",
+                    withNavBar: true,
+                    haveSign: req.session.signatureId,
+                    errorMessage: "Oops! an Error has occurred.",
+                });
+            });
+
+        //If not, not save changes.
+        // addMoreInfo(req.body, req.session.userId)
+        //     .then(() => res.redirect("/petition"))
+        //     .catch((err) => console.log("Error Profile:", err));
+    }
 });
 
 app.post("/configuration/signature", (req, res) => {

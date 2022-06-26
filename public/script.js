@@ -17,6 +17,7 @@ let initY = 0;
 let lastX = 0;
 let lastY = 0;
 let mouseDown = false;
+let drawCanva = false;
 
 function drawing(iX, iY, fX, fY) {
     ctx.beginPath();
@@ -39,6 +40,7 @@ canva.addEventListener("mousedown", (event) => {
     initX = event.offsetX - offsetLeft;
     initY = event.offsetY;
     mouseDown = true;
+    drawCanva = true;
     console.log(`initX ${initX}, initY ${initY}`);
 });
 
@@ -78,10 +80,13 @@ canva.addEventListener("mouseup", (event) => {
 });
 
 resetCanvaButton.addEventListener("click", (e) => {
+    drawCanva = false;
     clearCanva();
 });
 
 submitButton.addEventListener("click", (e) => {
-    const dataURL = canva.toDataURL();
-    signatureInput.value = dataURL;
+    if (drawCanva) {
+        const dataURL = canva.toDataURL();
+        signatureInput.value = dataURL;
+    }
 });

@@ -3,7 +3,7 @@ const {
     registerUser,
     getUserByEmail,
     addUserInfo,
-    getSignatureBySignatureId,
+    getUserNameAndSignatureBySignatureId,
     getPasswordByUserId,
     updatePasswordByUserId,
     deleteUserByUserId,
@@ -41,7 +41,7 @@ function compareInputAndSavedPassByUserId(userId, inputPass) {
 
 module.exports.getSignatureByIdAndTotalSigners = (signatureId) => {
     return Promise.all([
-        getSignatureBySignatureId(signatureId),
+        getUserNameAndSignatureBySignatureId(signatureId),
         countSignatures(),
     ])
         .then((result) => {
@@ -108,6 +108,35 @@ exports.logInVerify = (userLogIn) => {
         });
 };
 
+// FIXME!
+exports.validateProfileInputs = function validateProfileInputs(obj) {
+    const profileObj = {
+        age: null,
+        city: null,
+        profilePage: null,
+    };
+
+    if (obj.profilePage.trim().length != 0) {
+        const profilePage = obj.profilePage;
+        console.log("profilePage", profilePage);
+        if (
+            profilePage.startsWith("http://") ||
+            profilePage.startsWith("https://") ||
+            profilePage.startsWith("//")
+        ) {
+            return "Profile Page Not accepted.";
+        } else {
+            profileObj.profilePage = profilePage;
+        }
+    }
+    // Not working with "" now...
+    profileObj.age = obj.age || null;
+    // profilePage = moreInfo.profilePage || null;
+    profileObj.city = obj.city || null;
+
+    return profileObj;
+};
+
 exports.addMoreInfo = (moreInfo, userId) => {
     return new Promise((resolve, reject) => {
         if (allStringsAreEmpty(moreInfo)) {
@@ -118,28 +147,14 @@ exports.addMoreInfo = (moreInfo, userId) => {
         // REVIEW. test to see that we dont need it
         // If not there was at least one input startsWith()
         // capitalizeFirstLetter
-        // if (moreInfo.profilePage.length != 0) {
-        //     profilePage = moreInfo.profilePage;
-        //     console.log("profilePage", profilePage);
-        //     if (
-        //         profilePage.startsWith("http://") ||
-        //         profilePage.startsWith("https://") ||
-        //         profilePage.startsWith("//")
-        //     ) {
-        //         return "Profile Page Not accepted.";
-        //     }
-        // }
-        const profilePage = moreInfo.profilePage || null;
-        const city = moreInfo.city || null;
-        // Not working with "" now...
-        let age = moreInfo.age || null;
+        const profileobj = validateProfileInputs(moreInfo);
 
         // write in the data base.
         return addUserInfo(
             userId,
-            age,
-            capitalizeFirstLetter(city),
-            profilePage
+            profileobj.age,
+            profileobj.city,
+            profileobj.profilePage
         )
             .then((result) => resolve(result))
             .catch((err) => reject(err));

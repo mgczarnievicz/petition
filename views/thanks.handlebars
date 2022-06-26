@@ -1,15 +1,22 @@
+{{> products}}
+
+
 <section class="thanks-section section-container">
 
-    <h1>Thank you for signing our petition!</h1>
-    <br />
-
+<div class="inside-container config-container">
     {{#user}}
 
-        <p>{{first}} {{last}} </p>
+        <h1>Thank you {{name}} {{surname}}!</h1>
+        <br />
+        <h2>For signing our petition</h2>
+
         <img src="{{signature}}" />
 
     {{/user}}
 
-    <p>See all <a href="/signers"> {{totalSigners}} Signers </a> </p>
+    <h3>See all <a href="/signers"> {{totalSigners}} Signers </a> </h3>
+
+</div>
+
 
 </section>
