@@ -16,7 +16,12 @@ const db = spicedPg(
         `postgres:${USER_NAME}:${USER_PASSWORD}@localhost:5432/${database}`
 );
 
+// REVIEW!! See bc is in antoher module process
+exports.capitalizeFirstLetter = capitalizeFirstLetter;
+
 function capitalizeFirstLetter(string) {
+    string = string.trim();
+    console.log("string.trim() in db:", string);
     return string.charAt(0).toUpperCase() + string.slice(1).toLowerCase();
 }
 
@@ -46,6 +51,13 @@ module.exports.updatePasswordByUserId = (newpass, userId) => {
 };
 
 module.exports.registerUser = (name, surname, email, password) => {
+    console.log(
+        "Log registerUser:\n name, surname, email, password:",
+        name,
+        surname,
+        email,
+        password
+    );
     const q = `INSERT INTO users (name, surname, email, password)
     VALUES ($1, $2, $3, $4 ) RETURNING id, name, surname`;
 
@@ -194,7 +206,7 @@ module.exports.getSignersByCity = (searchCity) => {
         ON signatures.user_id=users.id  
         JOIN user_profiles
         ON user_profiles.user_id=users.id
-        WHERE user_profiles.city = $1
+        WHERE LOWER(user_profiles.city) = LOWER($1)
         ORDER BY users.surname`,
         [capitalizeFirstLetter(searchCity)]
     );

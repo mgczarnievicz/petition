@@ -55,6 +55,7 @@ h2,
 h3 {
     margin: 5px 0;
     width: 100%;
+    text-align: center;
 }
 
 p {
@@ -98,19 +99,31 @@ nav a:hover {
     width: 80%;
     background-color: white;
     border-radius: 12px;
-    padding: 5%;
+    padding: 3% 5% 2% 5%;
+}
+
+.info-container h1 {
+    margin: 5px 0 16px 0px;
+}
+
+.info-container p {
+    text-align: justify;
 }
 
 .info-container .info-center {
     margin-top: 62px;
     text-align: center;
 }
+.info-center p {
+    text-align: center;
+}
 
 .img-info {
-    margin-top: 10px;
+    /* margin-top: 10px; */
     display: flex;
     flex-direction: row;
     justify-content: space-between;
+    flex-wrap: wrap;
 }
 .img-info img {
     width: 200px;
@@ -208,6 +221,7 @@ nav a:hover {
     display: flex;
     flex-direction: column;
     width: 80%;
+    min-width: 450px;
     margin: 10px;
 }
 
@@ -230,7 +244,7 @@ nav a:hover {
 
 .form-container .buttons-container {
     text-align: center;
-    margin-top: 20px;
+    margin-top: 10px;
 }
 
 .form-container button,
@@ -240,10 +254,11 @@ nav a:hover {
     border-radius: 9px;
     border: 1.5 solid;
     border-color: var(--color-dark);
+    margin: 20px;
 }
 
 .form-container button {
-    margin-right: 50px;
+    margin: 20px;
 }
 
 .buttons-container .likeButton {

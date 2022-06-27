@@ -1,4 +1,5 @@
 const {
+    capitalizeFirstLetter,
     countSignatures,
     registerUser,
     getUserByEmail,
@@ -13,9 +14,12 @@ const {
 
 const bcrypt = require("./encryption");
 
-function capitalizeFirstLetter(string) {
-    return string.charAt(0).toUpperCase() + string.slice(1).toLowerCase();
-}
+// REVIEW!! See bc is in antoher module db
+// function capitalizeFirstLetter(string) {
+//     string = string.trim();
+//     console.log("string.trim() in process:", string);
+//     return string.charAt(0).toUpperCase() + string.slice(1).toLowerCase();
+// }
 
 function allStringsAreEmpty(obj) {
     for (let key in obj) {
@@ -52,11 +56,12 @@ module.exports.getSignatureByIdAndTotalSigners = (signatureId) => {
         })
         .catch((error) => error);
 };
-// false -> input empty.
-// true -> input with stuf.
-exports.verifyingInputs = (obj) => {
+// false -> input with stuff.
+// true -> input emptz.
+exports.verifyingEmptyInputs = (obj) => {
     for (let key in obj) {
-        if (obj[key].trim().length === 0) {
+        if (obj[key].trim().length !== 0) {
+            console.log("verifyingEmptyInputs: \nFound sth", obj[key].trim());
             return false;
         }
     }
@@ -109,7 +114,9 @@ exports.logInVerify = (userLogIn) => {
 };
 
 // FIXME!
-exports.validateProfileInputs = function validateProfileInputs(obj) {
+exports.validateProfileInputs = validateProfileInputs;
+
+function validateProfileInputs(obj) {
     const profileObj = {
         age: null,
         city: null,
@@ -135,7 +142,7 @@ exports.validateProfileInputs = function validateProfileInputs(obj) {
     profileObj.city = obj.city || null;
 
     return profileObj;
-};
+}
 
 exports.addMoreInfo = (moreInfo, userId) => {
     return new Promise((resolve, reject) => {

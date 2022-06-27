@@ -2,6 +2,7 @@ const PORT = 8080;
 
 const express = require("express");
 const app = express();
+exports.app = app;
 
 const { engine } = require("express-handlebars");
 app.engine("handlebars", engine());
@@ -26,7 +27,7 @@ const {
     getSignatureByIdAndTotalSigners,
     registerNewUser,
     logInVerify,
-    verifyingInputs,
+    verifyingEmptyInputs,
     addMoreInfo,
     setNewPassword,
     deleteUser,
@@ -137,6 +138,7 @@ app.get("/login", (req, res) => {
 });
 
 app.get("/profile", (req, res) => {
+    // look in db if thez have a row.
     res.render("moreInfo", {
         title: "Profile",
         withNavBar: true,
@@ -158,7 +160,6 @@ app.get("/thanks", (req, res) => {
     console.log("req.session.signatureId", req.session.signatureId);
     getSignatureByIdAndTotalSigners(req.session.signatureId)
         .then((result) => {
-            console.log("lo que mando a thanks:", result[0]);
             res.render("thanks", {
                 title: "Thanks",
                 withNavBar: true,
@@ -269,7 +270,7 @@ app.post("/home", (req, res) => {
     console.log("Getting Home info");
     console.log("req.body", req.body);
     // Verify the empty Strings!   Empty inputs are not valids"
-    if (!verifyingInputs(req.body)) {
+    if (verifyingEmptyInputs(req.body)) {
         res.render("home", {
             title: "Home",
             withNavBar: false,
@@ -356,9 +357,10 @@ app.post("/petition", (req, res) => {
     }
 });
 
+// REVIEW add a row if there is no inputs.
 app.post("/profile", (req, res) => {
     console.log("req.body", req.body);
-    if (!verifyingInputs(req.body)) {
+    if (verifyingEmptyInputs(req.body)) {
         res.render("moreInfo", {
             title: "Profile",
             withNavBar: true,
@@ -397,12 +399,13 @@ app.post("/configuration/profile", (req, res) => {
     console.log("New uesrInfo", uesrInfo);
     console.log("New profileObj", profileObj);
 
-    if (!verifyingInputs(uesrInfo)) {
+    if (verifyingEmptyInputs(uesrInfo)) {
         res.render("configProfile", {
             title: "Configuration",
             withNavBar: true,
             haveSign: req.session.signatureId,
             errorMessage: "Name, Surname and Email must be complete.",
+            user: req.body,
         });
     } else {
         const profileObjCl = validateProfileInputs(profileObj);
@@ -500,8 +503,10 @@ app.post("/configuration/deleteAccount", (req, res) => {
         );
 });
 
-app.listen(process.env.PORT || PORT, () => {
-    console.log(
-        `\t Server is lisening on port ${PORT}\n\t http://localhost:${PORT}/home\n`
-    );
-});
+if (require.main === module) {
+    app.listen(process.env.PORT || PORT, () => {
+        console.log(
+            `\t Server is lisening on port ${PORT}\n\t http://localhost:${PORT}/home\n`
+        );
+    });
+}
