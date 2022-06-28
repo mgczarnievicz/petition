@@ -32,6 +32,8 @@ const {
     setNewPassword,
     deleteUser,
     validateProfileInputs,
+    searchProfile,
+    cleanEmptySpaces,
 } = require("./process");
 
 const bodyParser = require("body-parser");
@@ -57,6 +59,15 @@ app.use((req, res, next) => {
     res.setHeader("x-frame-options", "deny");
     next();
 });
+
+if (process.env.NODE_ENV == "production") {
+    app.use((req, res, next) => {
+        if (req.headers["x-forwarded-proto"].startsWith("https")) {
+            return next();
+        }
+        res.redirect(`https://${req.hostname}${req.url}`);
+    });
+}
 
 app.use((req, res, next) => {
     console.log("---------------------");
@@ -86,17 +97,21 @@ app.use((req, res, next) => {
     } else if (req.session.userId) {
         if (!req.session.signatureId) {
             if (
+                req.url == "/" ||
                 req.url == "/home" ||
                 req.url == "/login" ||
                 req.url == "/thanks" ||
                 req.url.includes("/signers")
             ) {
                 res.redirect("/petition");
+            } else if (req.url == "/configuration/signature") {
+                res.redirect("/configuration");
             } else {
                 next();
             }
         } else if (req.session.signatureId) {
             if (
+                req.url == "/" ||
                 req.url == "/home" ||
                 req.url == "/login" ||
                 req.url == "/petition" ||
@@ -139,12 +154,20 @@ app.get("/login", (req, res) => {
 
 app.get("/profile", (req, res) => {
     // look in db if thez have a row.
-    res.render("moreInfo", {
-        title: "Profile",
-        withNavBar: true,
-        haveSign: false,
-        errorMessage: false,
-    });
+    searchProfile(req.session.userId)
+        .then((result) => {
+            console.log("Result searchProfile", result);
+            res.redirect("/petition");
+        })
+        .catch((err) => {
+            console.log("Error in profile", err);
+            res.render("moreInfo", {
+                title: "Profile",
+                withNavBar: true,
+                haveSign: false,
+                errorMessage: false,
+            });
+        });
 });
 
 app.get("/petition", (req, res) => {
@@ -278,25 +301,37 @@ app.post("/home", (req, res) => {
             errorMessage: "Empty inputs are not valids.",
         });
     } else {
-        registerNewUser(req.body)
+        const userInfo = cleanEmptySpaces(req.body);
+        console.log("userInfo clean", userInfo);
+        registerNewUser(userInfo)
             .then((currentUser) => {
                 console.log("currentUser", currentUser);
-                req.session.userId = currentUser.id;
-                res.redirect("/profile");
+
+                if (typeof currentUser === "string") {
+                    res.render("home", {
+                        title: "Home",
+                        withNavBar: false,
+                        haveSign: false,
+                        errorMessage: currentUser,
+                    });
+                } else {
+                    req.session.userId = currentUser.id;
+                    res.redirect("/profile");
+                }
             })
-            .catch(() =>
+            .catch(() => {
                 res.render("home", {
                     title: "Home",
                     withNavBar: false,
                     haveSign: false,
                     errorMessage: "Oops! an Error has occurred.",
-                })
-            );
+                });
+            });
     }
 });
 
 app.post("/login", (req, res) => {
-    logInVerify(req.body)
+    logInVerify(cleanEmptySpaces(req.body))
         .then((userLogIn) => {
             console.log("userLogIn:", userLogIn);
             if (typeof userLogIn === "string") {
@@ -360,27 +395,17 @@ app.post("/petition", (req, res) => {
 // REVIEW add a row if there is no inputs.
 app.post("/profile", (req, res) => {
     console.log("req.body", req.body);
-    if (verifyingEmptyInputs(req.body)) {
-        res.render("moreInfo", {
-            title: "Profile",
-            withNavBar: true,
-            haveSign: req.session.signatureId,
-            errorMessage:
-                "Empty inputs are not valids. Complete or Press Skip this.",
-        });
-    } else {
-        addMoreInfo(req.body, req.session.userId)
-            .then(() => res.redirect("/petition"))
-            .catch((err) => {
-                console.log("Error Profile:", err);
-                res.render("moreInfo", {
-                    title: "Profile",
-                    withNavBar: true,
-                    haveSign: req.session.signatureId,
-                    errorMessage: "Oops! an Error has occurred.",
-                });
+    addMoreInfo(req.body, req.session.userId)
+        .then(() => res.redirect("/petition"))
+        .catch((err) => {
+            console.log("Error Profile:", err);
+            res.render("moreInfo", {
+                title: "Profile",
+                withNavBar: true,
+                haveSign: req.session.signatureId,
+                errorMessage: "Oops! an Error has occurred.",
             });
-    }
+        });
 });
 
 app.post("/configuration/profile", (req, res) => {
@@ -396,6 +421,9 @@ app.post("/configuration/profile", (req, res) => {
     }))(req.body);
 
     // const uesrInfo = req.body;
+    uesrInfo = cleanEmptySpaces(uesrInfo);
+    profileObj = cleanEmptySpaces(profileObj);
+
     console.log("New uesrInfo", uesrInfo);
     console.log("New profileObj", profileObj);
 

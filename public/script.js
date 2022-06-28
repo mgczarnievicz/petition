@@ -79,12 +79,12 @@ canva.addEventListener("mouseup", (event) => {
     mouseDown = false;
 });
 
-resetCanvaButton.addEventListener("click", (e) => {
+resetCanvaButton.addEventListener("click", () => {
     drawCanva = false;
     clearCanva();
 });
 
-submitButton.addEventListener("click", (e) => {
+submitButton.addEventListener("click", () => {
     if (drawCanva) {
         const dataURL = canva.toDataURL();
         signatureInput.value = dataURL;

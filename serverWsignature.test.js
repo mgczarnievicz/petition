@@ -25,6 +25,7 @@ req.url == "/configuration/deleteAccount"
 const supertest = require("supertest");
 const { app } = require("./server.js");
 const cookieSession = require("cookie-session");
+const { searchProfileByUserId } = require("./db.js");
 
 // !!!!! como hago esto??
 jest.mock("./db.js");
@@ -71,8 +72,21 @@ test("Get: /login -> expected to redirect petition", () => {
         });
 });
 
-// ?????? what should I do???
+// I already have a user Id and Signature Id.
 test("Get: /profile -> expected redirect to thanks", () => {
+    searchProfileByUserId.mockImplementationOnce(() =>
+        Promise.resolve({
+            rows: [
+                {
+                    id: 1,
+                    user_id: 1,
+                    age: null,
+                    city: null,
+                    profilePage: null,
+                },
+            ],
+        })
+    );
     return supertest(app)
         .get("/profile")
         .then((res) => {

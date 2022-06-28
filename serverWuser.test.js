@@ -26,6 +26,10 @@ const supertest = require("supertest");
 const { app } = require("./server.js");
 const cookieSession = require("cookie-session");
 
+const { searchProfileByUserId, getUserInformationById } = require("./db.js");
+
+jest.mock("./db.js");
+
 cookieSession.mockSession({
     userId: 1,
     signatureId: null,
@@ -40,7 +44,6 @@ test("Get: / -> expected redirect to petition", () => {
         });
 });
 
-// Se pueden ver las cookies???
 test("Get: /logout -> expected to go to login", () => {
     return supertest(app)
         .get("/logout")
@@ -68,13 +71,40 @@ test("Get: /login -> expected to redirect petition", () => {
         });
 });
 
-// ?????? what should I do???
-test("Get: /profile -> expected redirect to home", () => {
+test("Get: /profile when first time register-> expected redirect to petition", () => {
+    searchProfileByUserId.mockImplementationOnce(() =>
+        Promise.resolve({
+            rows: [],
+        })
+    );
+
+    return supertest(app)
+        .get("/profile")
+        .then((res) => {
+            expect(res.statusCode).toBe(200);
+        });
+});
+
+test("Get: /profile when user login-> expected redirect to petition", () => {
+    searchProfileByUserId.mockImplementationOnce(() =>
+        Promise.resolve({
+            rows: [
+                {
+                    id: 1,
+                    user_id: 1,
+                    age: null,
+                    city: null,
+                    profilePage: null,
+                },
+            ],
+        })
+    );
+
     return supertest(app)
         .get("/profile")
         .then((res) => {
             expect(res.statusCode).toBe(302);
-            expect(res.headers.location).toBe("/home");
+            expect(res.headers.location).toBe("/petition");
         });
 });
 
@@ -122,19 +152,33 @@ test("Get: /configuration -> expected to go to configuration", () => {
 });
 
 test("Get: /configuration/profile -> expected to go to  /configuration/profile", () => {
+    getUserInformationById.mockImplementationOnce(() =>
+        Promise.resolve({
+            rows: [
+                {
+                    name: "Maria",
+                    surname: "Inciarte",
+                    email: "maria@iniciate",
+                    age: null,
+                    city: null,
+                    profilePage: null,
+                },
+            ],
+        })
+    );
     return supertest(app)
         .get("/configuration/profile")
         .then((res) => {
             expect(res.statusCode).toBe(200);
         });
 });
-// ????? i am not showing this rout, expected data from DataBase!!!
-test("Get: /configuration/signature -> expected to redirect petition", () => {
+
+test("Get: /configuration/signature -> expected to redirect configuration", () => {
     return supertest(app)
         .get("/configuration/signature")
         .then((res) => {
             expect(res.statusCode).toBe(302);
-            expect(res.headers.location).toBe("/petition");
+            expect(res.headers.location).toBe("/configuration");
         });
 });
 

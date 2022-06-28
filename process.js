@@ -1,5 +1,4 @@
 const {
-    capitalizeFirstLetter,
     countSignatures,
     registerUser,
     getUserByEmail,
@@ -10,26 +9,34 @@ const {
     deleteUserByUserId,
     deleteProfileByUserId,
     deleteSignatureByUserId,
+    searchProfileByUserId,
 } = require("./db");
 
 const bcrypt = require("./encryption");
 
-// REVIEW!! See bc is in antoher module db
-// function capitalizeFirstLetter(string) {
-//     string = string.trim();
-//     console.log("string.trim() in process:", string);
-//     return string.charAt(0).toUpperCase() + string.slice(1).toLowerCase();
-// }
-
-function allStringsAreEmpty(obj) {
-    for (let key in obj) {
-        if (obj[key].trim().length != 0) {
-            return false;
-        }
-    }
-    return true;
+// REVIEW!!
+function capitalizeFirstLetter(string) {
+    string = string.replace(/\s\s+/g, " ").trim();
+    console.log("string.trim() in process:", string);
+    return string.charAt(0).toUpperCase() + string.slice(1).toLowerCase();
 }
 
+// function allStringsAreEmpty(obj) {
+//     for (let key in obj) {
+//         if (obj[key].trim().length != 0) {
+//             return false;
+//         }
+//     }
+//     return true;
+// }
+
+exports.cleanEmptySpaces = (obj) => {
+    const returnObj = {};
+    for (let key in obj) {
+        returnObj[key] = obj[key].replace(/\s\s+/g, " ").trim();
+    }
+    return returnObj;
+};
 function compareInputAndSavedPassByUserId(userId, inputPass) {
     return getPasswordByUserId(userId)
         .catch((err) => err)
@@ -83,7 +90,7 @@ exports.registerNewUser = (newUser) => {
                 hashpass
             )
                 .then((dbresult) => dbresult.rows[0])
-                .catch((err) => err);
+                .catch(() => "Email already register.");
         })
         .catch((hasherr) => hasherr);
 };
@@ -113,9 +120,7 @@ exports.logInVerify = (userLogIn) => {
         });
 };
 
-// FIXME!
 exports.validateProfileInputs = validateProfileInputs;
-
 function validateProfileInputs(obj) {
     const profileObj = {
         age: null,
@@ -124,7 +129,7 @@ function validateProfileInputs(obj) {
     };
 
     if (obj.profilePage.trim().length != 0) {
-        const profilePage = obj.profilePage;
+        const profilePage = obj.profilePage.trim();
         console.log("profilePage", profilePage);
         if (
             profilePage.startsWith("http://") ||
@@ -139,33 +144,32 @@ function validateProfileInputs(obj) {
     // Not working with "" now...
     profileObj.age = obj.age || null;
     // profilePage = moreInfo.profilePage || null;
-    profileObj.city = obj.city || null;
+    profileObj.city = capitalizeFirstLetter(obj.city) || null;
 
     return profileObj;
 }
 
-exports.addMoreInfo = (moreInfo, userId) => {
-    return new Promise((resolve, reject) => {
-        if (allStringsAreEmpty(moreInfo)) {
-            // All input are empty so we dont save
-            resolve();
-        }
-
-        // REVIEW. test to see that we dont need it
-        // If not there was at least one input startsWith()
-        // capitalizeFirstLetter
-        const profileobj = validateProfileInputs(moreInfo);
-
-        // write in the data base.
-        return addUserInfo(
-            userId,
-            profileobj.age,
-            profileobj.city,
-            profileobj.profilePage
-        )
-            .then((result) => resolve(result))
-            .catch((err) => reject(err));
+exports.searchProfile = (userId) => {
+    return searchProfileByUserId(userId).then((result) => {
+        return result.rows[0].id ? true : false;
     });
+};
+
+exports.addMoreInfo = (moreInfo, userId) => {
+    // REVIEW. test to see that we dont need it
+    // If not there was at least one input startsWith()
+    // capitalizeFirstLetter
+    const profileobj = validateProfileInputs(moreInfo);
+
+    // write in the data base.
+    return addUserInfo(
+        userId,
+        profileobj.age,
+        profileobj.city,
+        profileobj.profilePage
+    )
+        .then((result) => result)
+        .catch((err) => err);
 };
 
 exports.setNewPassword = (userId, oldPassword, newPassword) => {

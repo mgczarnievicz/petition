@@ -16,15 +16,6 @@ const db = spicedPg(
         `postgres:${USER_NAME}:${USER_PASSWORD}@localhost:5432/${database}`
 );
 
-// REVIEW!! See bc is in antoher module process
-exports.capitalizeFirstLetter = capitalizeFirstLetter;
-
-function capitalizeFirstLetter(string) {
-    string = string.trim();
-    console.log("string.trim() in db:", string);
-    return string.charAt(0).toUpperCase() + string.slice(1).toLowerCase();
-}
-
 /* ---------------------------------------------------------------
                     users TABLE
 ----------------------------------------------------------------*/
@@ -38,6 +29,14 @@ module.exports.getPasswordByUserId = (userId) => {
         `SELECT password FROM users
         WHERE id = $1`,
         [userId]
+    );
+};
+
+module.exports.searchingEmail = (email) => {
+    return db.query(
+        `SELECT password FROM users
+        WHERE email = $1`,
+        [email]
     );
 };
 
@@ -136,7 +135,7 @@ module.exports.addUserInfo = (user_id, age, city, profilePage) => {
     const q = `INSERT INTO user_profiles (user_id, age, city, profilePage)
     VALUES ($1, $2, $3, $4 ) RETURNING id`;
 
-    const param = [user_id, age, capitalizeFirstLetter(city), profilePage];
+    const param = [user_id, age, city, profilePage];
     return db.query(q, param);
 };
 
@@ -145,7 +144,7 @@ module.exports.updateProfile = (user_id, age, city, profilePage) => {
     VALUES ($1, $2, $3, $4)
     ON CONFLICT (user_id)
     DO UPDATE SET age=$2, city=$3, profilePage=$4`;
-    const param = [user_id, age, capitalizeFirstLetter(city), profilePage];
+    const param = [user_id, age, city, profilePage];
 
     return db.query(q, param);
 };
@@ -155,6 +154,14 @@ module.exports.deleteProfileByUserId = (rowNum) => {
         `DELETE FROM user_profiles
                         WHERE user_id = $1`,
         [rowNum]
+    );
+};
+
+module.exports.searchProfileByUserId = (userId) => {
+    return db.query(
+        `SELECT * FROM user_profiles
+                        WHERE user_id = $1`,
+        [userId]
     );
 };
 
@@ -208,7 +215,7 @@ module.exports.getSignersByCity = (searchCity) => {
         ON user_profiles.user_id=users.id
         WHERE LOWER(user_profiles.city) = LOWER($1)
         ORDER BY users.surname`,
-        [capitalizeFirstLetter(searchCity)]
+        [searchCity]
     );
 };
 
