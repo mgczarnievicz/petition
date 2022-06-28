@@ -127,9 +127,9 @@ function validateProfileInputs(obj) {
             profilePage.startsWith("https://") ||
             profilePage.startsWith("//")
         ) {
-            return "Profile Page Not accepted.";
-        } else {
             profileObj.profilePage = profilePage;
+        } else {
+            return "Profile Page Not accepted.";
         }
     }
     // Not working with "" now...

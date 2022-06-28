@@ -464,32 +464,45 @@ app.post("/configuration/profile", (req, res) => {
     } else {
         const profileObjCl = validateProfileInputs(profileObj);
 
-        //  updateUser (name, surname, email, password, userId)
-        // updateProfile = (user_id, age, city, profilePage)
-        Promise.all([
-            updateUser(
-                uesrInfo.name,
-                uesrInfo.surname,
-                uesrInfo.email,
-                req.session.userId
-            ),
-            updateProfile(
-                req.session.userId,
-                profileObjCl.age,
-                profileObjCl.city,
-                profileObjCl.profilePage
-            ),
-        ])
-            .then(() => res.redirect("/configuration"))
-            .catch((err) => {
-                console.log("Erro Updating user", err);
-                res.render("configProfile", {
-                    title: "Configuration",
-                    withNavBar: true,
-                    haveSign: req.session.signatureId,
-                    errorMessage: "Oops! an Error has occurred.",
-                });
+        console.log("New uesrInfo", uesrInfo);
+        console.log("New profileObjCL", profileObjCl);
+
+        if (typeof profileObjCl == "string") {
+            res.render("configProfile", {
+                title: "Configuration",
+                withNavBar: true,
+                haveSign: req.session.signatureId,
+                errorMessage: profileObjCl,
+                user: req.body,
             });
+        } else {
+            //  updateUser (name, surname, email, password, userId)
+            // updateProfile = (user_id, age, city, profilePage)
+            Promise.all([
+                updateUser(
+                    uesrInfo.name,
+                    uesrInfo.surname,
+                    uesrInfo.email,
+                    req.session.userId
+                ),
+                updateProfile(
+                    req.session.userId,
+                    profileObjCl.age,
+                    profileObjCl.city,
+                    profileObjCl.profilePage
+                ),
+            ])
+                .then(() => res.redirect("/configuration"))
+                .catch((err) => {
+                    console.log("Erro Updating user", err);
+                    res.render("configProfile", {
+                        title: "Configuration",
+                        withNavBar: true,
+                        haveSign: req.session.signatureId,
+                        errorMessage: "Oops! an Error has occurred.",
+                    });
+                });
+        }
     }
 });
 
