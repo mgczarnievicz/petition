@@ -16,17 +16,14 @@
             <input id="age" type="number" name="age" />
 
             <label for="city">City</label>
-            <input id="city" type="text" name="city" />
+            <input id="city" type="text" pattern="[A-Za-z\s]+" name="city" />
 
             <label for="profilePage">Profile Page</label>
             <input id="profilePage" type="url" name="profilePage" />
 
             <div class="buttons-container">
                 <button type="submit">Save Changes</button>
-                <input type="submit">Skip this</input>
-
-
-                 {{!-- <a href="/petition">Skip this</a> --}}
+                <button type="submit">Skip this</button>
 
 
             </div>

@@ -86,7 +86,6 @@ app.use(
 
 app.use(express.static("./public"));
 
-// REVIEW When we have the tables connected.
 app.use((req, res, next) => {
     if (!req.session.userId) {
         if (req.url != "/home" && req.url != "/login") {
@@ -211,8 +210,15 @@ app.get("/signers", (req, res) => {
                 listOfSigners: result.rows,
             });
         })
-        // REVIEW: VER QUE PASA EN CASO DE ERROR EN ESE CASO!
-        .catch((err) => console.log("Error:", err));
+        .catch((err) => {
+            console.log("Error /signers:", err);
+            res.render("signers", {
+                title: "Signers",
+                withNavBar: true,
+                haveSign: true,
+                errorMessage: "Oops! an Error has occurred.",
+            });
+        });
 });
 
 app.get("/signers/:city", (req, res) => {
@@ -227,8 +233,16 @@ app.get("/signers/:city", (req, res) => {
                 listOfSigners: result.rows,
             });
         })
-        // REVIEW: VER QUE PASA EN CASO DE ERROR EN ESE CASO!
-        .catch((err) => console.log("Error:", err));
+        .catch((err) => {
+            console.log("Error /signers/City:", err);
+            res.render("signers", {
+                title: "Signers",
+                withNavBar: true,
+                haveSign: true,
+                nameCity: req.params.city,
+                errorMessage: "Oops! an Error has occurred.",
+            });
+        });
 });
 
 app.get("/configuration", (req, res) => {
@@ -250,8 +264,16 @@ app.get("/configuration/profile", (req, res) => {
                 user: result.rows[0],
             });
         })
-        // REVIEW: VER QUE PASA EN CASO DE ERROR EN ESE CASO!
-        .catch((err) => console.log("Error getUserInformationById:", err));
+        .catch((err) => {
+            console.log("Error /config/profile:", err);
+            res.render("signers", {
+                title: "Signers",
+                withNavBar: true,
+                haveSign: true,
+                nameCity: req.params.city,
+                errorMessage: "Oops! an Error has occurred.",
+            });
+        });
 });
 
 app.get("/configuration/signature", (req, res) => {
@@ -265,8 +287,16 @@ app.get("/configuration/signature", (req, res) => {
                 signature: result.rows[0].signature,
             });
         })
-        // REVIEW: VER QUE PASA EN CASO DE ERROR EN ESE CASO!
-        .catch((err) => console.log("Error in config/signature", err));
+        .catch((err) => {
+            console.log("Error /config/signature:", err);
+            res.render("signers", {
+                title: "Signers",
+                withNavBar: true,
+                haveSign: true,
+                nameCity: req.params.city,
+                errorMessage: "Oops! an Error has occurred.",
+            });
+        });
 });
 
 app.get("/configuration/newpassword", (req, res) => {
@@ -366,7 +396,6 @@ app.post("/login", (req, res) => {
 
 app.post("/petition", (req, res) => {
     console.log("Getting info of pettion");
-    // REVIEW: SEE VERIFY THAT SIGNATURE IS NOT EMPTY!
     if (req.body.signature == "") {
         res.render("petition", {
             title: "Petition",
@@ -392,7 +421,6 @@ app.post("/petition", (req, res) => {
     }
 });
 
-// REVIEW add a row if there is no inputs.
 app.post("/profile", (req, res) => {
     console.log("req.body", req.body);
     addMoreInfo(req.body, req.session.userId)
@@ -410,7 +438,6 @@ app.post("/profile", (req, res) => {
 
 app.post("/configuration/profile", (req, res) => {
     console.log("req.body in config User", req.body);
-    // First verify Password if password correct then all good.
     let uesrInfo = (({ name, surname, email }) => ({ name, surname, email }))(
         req.body
     );
@@ -420,7 +447,6 @@ app.post("/configuration/profile", (req, res) => {
         profilePage,
     }))(req.body);
 
-    // const uesrInfo = req.body;
     uesrInfo = cleanEmptySpaces(uesrInfo);
     profileObj = cleanEmptySpaces(profileObj);
 
@@ -464,11 +490,6 @@ app.post("/configuration/profile", (req, res) => {
                     errorMessage: "Oops! an Error has occurred.",
                 });
             });
-
-        //If not, not save changes.
-        // addMoreInfo(req.body, req.session.userId)
-        //     .then(() => res.redirect("/petition"))
-        //     .catch((err) => console.log("Error Profile:", err));
     }
 });
 

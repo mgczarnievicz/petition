@@ -13,13 +13,13 @@
     <form class="register-form form-container" method="post">
 
         <label for="name">Name</label>
-        <input id="name" type="text" name="name" required />
+        <input id="name" type="text" pattern="[A-Za-z\s]+" name="name" required />
 
         <label for="surname">Surname</label>
-        <input id="surname" type="text" name="surname" required />
+        <input id="surname" type="text" pattern="[A-Za-z\s]+" name="surname" required />
 
         <label for="email">E-mail</label>
-        <input id="email" type="email" name="email" required />
+        <input id="email" type="email"  pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$" name="email" required />
 
         <label for="password">Password</label>
         <input id="password" type="password" name="password" required />

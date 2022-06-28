@@ -31,8 +31,7 @@ function drawing(iX, iY, fX, fY) {
 }
 
 function clearCanva() {
-    ctx.fillStyle = "white";
-    ctx.fillRect(0, 0, canva.width, canva.height);
+    ctx.clearRect(0, 0, canva.width, canva.height);
 }
 
 canva.addEventListener("mousedown", (event) => {

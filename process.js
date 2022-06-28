@@ -21,15 +21,6 @@ function capitalizeFirstLetter(string) {
     return string.charAt(0).toUpperCase() + string.slice(1).toLowerCase();
 }
 
-// function allStringsAreEmpty(obj) {
-//     for (let key in obj) {
-//         if (obj[key].trim().length != 0) {
-//             return false;
-//         }
-//     }
-//     return true;
-// }
-
 exports.cleanEmptySpaces = (obj) => {
     const returnObj = {};
     for (let key in obj) {

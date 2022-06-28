@@ -1,14 +1,17 @@
 {{> products}}
 
-
 <section class="signers-section section-container">
 
 <div class="inside-container  config-container table-container">
 
     <h1>List of the singers</h1>
+
     {{#if nameCity}}
         <h2>In the city of: {{nameCity}}</h2>
     {{/if}}
+
+        {{>message}}
+
 
     <table class="signers-table">
         {{#listOfSigners}}

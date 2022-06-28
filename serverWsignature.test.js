@@ -25,9 +25,16 @@ req.url == "/configuration/deleteAccount"
 const supertest = require("supertest");
 const { app } = require("./server.js");
 const cookieSession = require("cookie-session");
-const { searchProfileByUserId } = require("./db.js");
+const {
+    searchProfileByUserId,
+    getSigners,
+    getSignersByCity,
+    countSignatures,
+    getUserNameAndSignatureBySignatureId,
+    getUserInformationById,
+    getSignatureBySignatureId,
+} = require("./db.js");
 
-// !!!!! como hago esto??
 jest.mock("./db.js");
 
 cookieSession.mockSession({
@@ -35,12 +42,13 @@ cookieSession.mockSession({
     signatureId: 1,
 });
 
-test("Get: / -> expected redirect to petition", () => {
+// 1st to petition and then to thanks
+test("Get: / -> expected redirect to thanks", () => {
     return supertest(app)
         .get("/")
         .then((res) => {
             expect(res.statusCode).toBe(302);
-            expect(res.headers.location).toBe("/petition");
+            expect(res.headers.location).toBe("/thanks");
         });
 });
 
@@ -54,26 +62,29 @@ test("Get: /logout -> expected to go to login", () => {
         });
 });
 
-test("Get: /home -> expected to redirect petition", () => {
+// 1st to petition and then to thanks
+test("Get: /home -> expected to redirect thanks", () => {
     return supertest(app)
         .get("/home")
         .then((res) => {
             expect(res.statusCode).toBe(302);
-            expect(res.headers.location).toBe("/petition");
+            expect(res.headers.location).toBe("/thanks");
         });
 });
 
-test("Get: /login -> expected to redirect petition", () => {
+// 1st to petition and then to thanks
+test("Get: /login -> expected to redirect thanks", () => {
     return supertest(app)
         .get("/login")
         .then((res) => {
             expect(res.statusCode).toBe(302);
-            expect(res.headers.location).toBe("/petition");
+            expect(res.headers.location).toBe("/thanks");
         });
 });
 
 // I already have a user Id and Signature Id.
-test("Get: /profile -> expected redirect to thanks", () => {
+// And then to thanks
+test("Get: /profile -> expected redirect to thenks", () => {
     searchProfileByUserId.mockImplementationOnce(() =>
         Promise.resolve({
             rows: [
@@ -95,7 +106,7 @@ test("Get: /profile -> expected redirect to thanks", () => {
         });
 });
 
-test("Get: /petition -> expected to go to petition", () => {
+test("Get: /petition -> expected to go to thanks", () => {
     return supertest(app)
         .get("/petition")
         .then((res) => {
@@ -105,6 +116,20 @@ test("Get: /petition -> expected to go to petition", () => {
 });
 
 test("Get: /thanks -> expected to thanks", () => {
+    getUserNameAndSignatureBySignatureId.mockImplementationOnce(() =>
+        Promise.resolve({
+            rows: [
+                {
+                    name: "Maria",
+                    surname: "Inciarte",
+                    signature: "ajfafjbaewh",
+                },
+            ],
+        })
+    );
+
+    countSignatures.mockImplementationOnce(() => Promise.resolve({ rows: 2 }));
+
     return supertest(app)
         .get("/thanks")
         .then((res) => {
@@ -113,6 +138,33 @@ test("Get: /thanks -> expected to thanks", () => {
 });
 
 test("Get: /signers -> expected to /signers", () => {
+    getSigners.mockImplementationOnce(() =>
+        Promise.resolve({
+            rows: [
+                {
+                    id: 1,
+                    name: "Maria",
+                    surname: "Inciarte",
+                    signatureId: 2,
+                    age: 21,
+                    city: "Paloma",
+                    profilePage:
+                        "https://spiced.space/cayenne/schedule#current-week",
+                },
+                {
+                    id: 2,
+                    name: "Marte",
+                    surname: "Inciarte",
+                    signatureId: 3,
+                    age: 23,
+                    city: "Paloma",
+                    profilePage:
+                        "https://spiced.space/cayenne/schedule#current-week",
+                },
+            ],
+        })
+    );
+
     return supertest(app)
         .get("/signers")
         .then((res) => {
@@ -121,6 +173,31 @@ test("Get: /signers -> expected to /signers", () => {
 });
 
 test("Get: /signers/Paloma -> expected to redirect petition", () => {
+    getSignersByCity.mockImplementationOnce(() =>
+        Promise.resolve({
+            rows: [
+                {
+                    id: 1,
+                    name: "Maria",
+                    surname: "Inciarte",
+                    signatureId: 2,
+                    age: 21,
+                    profilePage:
+                        "https://spiced.space/cayenne/schedule#current-week",
+                },
+                {
+                    id: 2,
+                    name: "Marte",
+                    surname: "Inciarte",
+                    signatureId: 3,
+                    age: 23,
+                    profilePage:
+                        "https://spiced.space/cayenne/schedule#current-week",
+                },
+            ],
+        })
+    );
+
     return supertest(app)
         .get("/signers/Paloma")
         .then((res) => {
@@ -137,6 +214,20 @@ test("Get: /configuration -> expected to go to configuration", () => {
 });
 
 test("Get: /configuration/profile -> expected to go to  /configuration/profile", () => {
+    getUserInformationById.mockImplementationOnce(() =>
+        Promise.resolve({
+            rows: [
+                {
+                    name: "Maria",
+                    surname: "Inciarte",
+                    email: "maria@iniciate",
+                    age: 23,
+                    city: "Montevideo",
+                    profilePage: null,
+                },
+            ],
+        })
+    );
     return supertest(app)
         .get("/configuration/profile")
         .then((res) => {
@@ -145,6 +236,17 @@ test("Get: /configuration/profile -> expected to go to  /configuration/profile",
 });
 
 test("Get: /configuration/signature -> expected to go: /configuration/signature", () => {
+    getSignatureBySignatureId.mockImplementationOnce(() =>
+        Promise.resolve({
+            rows: [
+                {
+                    id: 2,
+                    user_id: 1,
+                    signature: "asfsdfrg",
+                },
+            ],
+        })
+    );
     return supertest(app)
         .get("/configuration/signature")
         .then((res) => {

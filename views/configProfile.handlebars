@@ -15,6 +15,7 @@
                 <input
                     id="name"
                     type="text"
+                    pattern="[A-Za-z\s]+"
                     name="name"
                     value="{{name}}"
                     required
@@ -24,6 +25,7 @@
                 <input
                     id="surname"
                     type="text"
+                    pattern="[A-Za-z\s]+"
                     name="surname"
                     value="{{surname}}"
                     required
@@ -34,15 +36,16 @@
                     id="email"
                     type="email"
                     name="email"
+                    pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$"
                     value="{{email}}"
                     required
                 />
 
                 <label for="age">Age</label>
-                <input id="age" type="number" name="age" value="{{age}}" />
+                <input id="age" type="number"  name="age" value="{{age}}" />
 
                 <label for="city">City</label>
-                <input id="city" type="text" name="city" value="{{city}}" />
+                <input id="city" type="text" pattern="[A-Za-z\s]+" name="city" value="{{city}}" />
 
                 <label for="profilePage">Profile Page</label>
                 <input
@@ -52,7 +55,7 @@
                     value="{{profilepage}}"
                 />
 
-                {{! Here or do a nuw section this is for a new password!!! this should be empty}}
+                {{! Here we can ask for the password for extra protecction}}
                 {{!-- <p>Confirm Password to save changes.</p>
                 <label for="password">Password</label>
                 <input id="password" type="password" name="password" required /> --}}
@@ -61,7 +64,7 @@
 
             <div class="buttons-container">
                 <button type="submit">Save Changes</button>
-                <a href="/configuration" class="likeButton">Back</a>
+                 <a href="/configuration" class="back-Button likeButton">Back</a>
             </div>
 
         </form>

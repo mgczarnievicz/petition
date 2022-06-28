@@ -8,16 +8,17 @@
 
     {{>message}}
 
-    <form class="form-container" method="post">
+    <form class="form-container delete-signature-form" method="post">
 
-        <img src="{{signature}}" />
+        <img class="img-signature" src="{{signature}}" />
 
         <h3>Are you sure that you want to delete your signature?</h3>
 
         <div class="buttons-container">
 
             <button type="submit">Confirm</button>
-            <a href="/configuration" class="likeButton">Cancel</a>
+            <a href="/configuration" class="cancel-Button likeButton">Cancel</a>
+
 
         </div>
 

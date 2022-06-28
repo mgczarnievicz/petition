@@ -83,8 +83,9 @@ nav a:hover {
     max-width: 50%;
     padding: 10px;
     display: flex;
+    flex-direction: column;
     align-items: center;
-    justify-content: center;
+    justify-content: flex-start;
     flex-wrap: wrap;
 }
 
@@ -93,6 +94,11 @@ nav a:hover {
     background-image: url("http://i0.wp.com/ytimg.googleusercontent.com/vi/ss7fz91syQo/maxresdefault.jpg?resize=160,120");
     background-repeat: no-repeat;
     background-size: cover;
+}
+
+.info-seccion {
+    align-items: center;
+    justify-content: center;
 }
 
 .info-container {
@@ -223,6 +229,7 @@ nav a:hover {
     width: 80%;
     min-width: 450px;
     margin: 10px;
+    font-size: 18px;
 }
 
 .form-container input {
@@ -259,6 +266,7 @@ nav a:hover {
 
 .form-container button {
     margin: 20px;
+    font-size: 18px;
 }
 
 .buttons-container .likeButton {
@@ -266,6 +274,12 @@ nav a:hover {
     border: 2px solid black;
     padding: 6.5px 60px;
     background-color: whitesmoke;
+    color: black;
+}
+
+.buttons-container .cancel-Button {
+    background-color: midnightblue;
+    color: aliceblue;
 }
 
 /* -----------------------------------------------------------------------
@@ -318,7 +332,7 @@ nav a:hover {
 }
 
 .signers-section .signers-table {
-    width: 80%;
+    width: 90%;
 }
 
 .signers-section .age-cell {
@@ -337,6 +351,10 @@ nav a:hover {
 .signers-section a {
     text-decoration: none;
     color: black;
+}
+
+.signers-section a:hover {
+    color: rgb(231, 235, 116);
 }
 
 /* -----------------------------------------------------------------------
@@ -392,6 +410,14 @@ nav a:hover {
     text-align: center;
 }
 
+.signature-section img {
+    margin-bottom: 12px;
+    width: 450px;
+}
+
+.delete-signature-form {
+    align-items: center;
+}
 /* -----------------------------------------------------------------------
                         Delete Account Configuration Section
 --------------------------------------------------------------------------*/
@@ -413,6 +439,9 @@ nav a:hover {
 .config-container {
     width: 90%;
     min-height: 400px;
+
+    /* ADDED this  SEE IF EVERYTHING ELSE BREACK*/
+    justify-content: center;
 }
 /* -----------------------------------------------------------------------
                         Media Query
@@ -444,11 +473,11 @@ nav a:hover {
     }
 
     .info-seccion {
-        align-items: flex-start;
-        justify-content: center;
+        align-items: center;
+        justify-content: flex-start;
     }
     .info-container {
-        margin-top: 10%;
+        margin-top: 13%;
     }
     .products-container {
         min-height: 750px;
@@ -457,7 +486,12 @@ nav a:hover {
         min-height: 600px;
     }
     .left-section {
-        max-width: 55%;
+        max-width: 45%;
         padding: 20px;
     }
+    .product-section {
+        padding-top: 2%;
+    }
+}
+@media screen and (min-width: 600px) {
 }
