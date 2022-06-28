@@ -146,11 +146,15 @@ exports.searchProfile = (userId) => {
     });
 };
 
-exports.addMoreInfo = (moreInfo, userId) => {
+exports.addMoreInfo = (moreInfo, userId, empty) => {
     // REVIEW. test to see that we dont need it
     // If not there was at least one input startsWith()
     // capitalizeFirstLetter
-    const profileobj = validateProfileInputs(moreInfo);
+    let profileobj = moreInfo;
+    if (!empty) {
+        profileobj = validateProfileInputs(moreInfo);
+        console.log("I am not empty", profileobj);
+    }
 
     // write in the data base.
     return addUserInfo(

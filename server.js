@@ -423,7 +423,19 @@ app.post("/petition", (req, res) => {
 
 app.post("/profile", (req, res) => {
     console.log("req.body", req.body);
-    addMoreInfo(req.body, req.session.userId)
+    let empty = true;
+    let profileOb = {
+        age: null,
+        city: null,
+        profilePage: null,
+    };
+    if (req.body.buttonAdd == "") {
+        console.log("I am adding??");
+        profileOb = req.body;
+        empty = false;
+    }
+    console.log("profileOb", profileOb);
+    addMoreInfo(profileOb, req.session.userId, empty)
         .then(() => res.redirect("/petition"))
         .catch((err) => {
             console.log("Error Profile:", err);
