@@ -546,8 +546,17 @@ app.post("/configuration/newpassword", (req, res) => {
                 errorMessage: "Oops! an Error has occurred.",
             })
         )
-        .then(() => {
-            res.redirect("/configuration");
+        .then((result) => {
+            if (typeof result == "string") {
+                res.render("newPassword", {
+                    title: "Configuration",
+                    withNavBar: true,
+                    haveSign: req.session.signatureId,
+                    errorMessage: result,
+                });
+            } else {
+                res.redirect("/configuration");
+            }
         });
 });
 
