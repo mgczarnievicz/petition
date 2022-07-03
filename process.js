@@ -129,7 +129,8 @@ function validateProfileInputs(obj) {
         ) {
             profileObj.profilePage = profilePage;
         } else {
-            return "Profile Page Not accepted.";
+            profileObj.profilePage = null;
+            // return "Profile Page Not accepted.";
         }
     }
     // Not working with "" now...
