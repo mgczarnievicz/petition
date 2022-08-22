@@ -55,7 +55,7 @@ module.exports.getSignatureByIdAndTotalSigners = (signatureId) => {
         .catch((error) => error);
 };
 // false -> input with stuff.
-// true -> input emptz.
+// true -> input empty.
 exports.verifyingEmptyInputs = (obj) => {
     for (let key in obj) {
         if (obj[key].trim().length !== 0) {
