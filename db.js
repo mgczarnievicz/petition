@@ -20,6 +20,22 @@ const db = spicedPg(
                     users TABLE
 ----------------------------------------------------------------*/
 
+module.exports.registerUser = (name, surname, email, password) => {
+    console.log(
+        "Log registerUser:\n name, surname, email, password:",
+        name,
+        surname,
+        email,
+        password
+    );
+    const q = `INSERT INTO users (name, surname, email, password)
+    VALUES ($1, $2, $3, $4 ) RETURNING id, name, surname`;
+
+    // RETURNING all
+    const param = [name, surname, email, password];
+    return db.query(q, param);
+};
+
 module.exports.getCompleteNameByUserId = (userId) => {
     return db.query(`SELECT name, surname FROM user WHERE id = $1`, [userId]);
 };
