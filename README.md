@@ -29,13 +29,7 @@ This particular petition advocates for more latin product in german supermarkets
 ## Technologies
 
 [![My Skills](https://skillicons.dev/icons?i=js,css)](https://skillicons.dev)
-<a href="https://handlebarsjs.com/" target="_blank"> <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/handlebars/handlebars-original.svg" alt="handlebars" width="40" height="40"/> </a> 
-
-## Made by.
-
-This page was made by Gimena, designed by Klaus and spelling review by Jan.
-
-For the load of md files, it was following the tutorial of Brad Traversy.
+<a href="https://handlebarsjs.com/" target="_blank"> <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/handlebars/handlebars-original.svg" alt="handlebars" width="40" height="40"/> </a>
 
 ## Preview
 
@@ -44,4 +38,5 @@ For the load of md files, it was following the tutorial of Brad Traversy.
 ![Registration]()
 
 ### Login
+
 ![LogIn]()
