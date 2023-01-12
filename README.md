@@ -2,13 +2,27 @@
 
 ## Running the project
 
-First, run the development server:
+1. Clone the project.
+2. Run `npm install`
+3. Create Data Base call `petition`
+4. Create tables running file `setup.sql`
+5. Create a `secret.json` file.
 
-```bash
-npm run dev
+```json
+{
+    "USER_NAME": "",
+    "USER_PASSWORD": "",
+    "COOKIE_SECRET": ""
+}
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Now run the server:
+
+```bash
+node server
+```
+
+Open [http://localhost:8080](http://localhost:8080) with your browser to see the result.
 
 ## Overview
 
@@ -37,6 +51,20 @@ This particular petition advocates for more latin product in german supermarkets
 
 ![Registration]()
 
+### Signing the Petition
+
+![LogIn]()
+
+### List of signers
+
+![LogIn]()
+
+### Updating User Profile
+
+### Viewing List of Supporters (Total Count & by Location)
+
+### Delete Account
 ### Login
+
 
 ![LogIn]()
