@@ -49,22 +49,24 @@ This particular petition advocates for more latin product in german supermarkets
 
 ### Registration
 
-![Registration]()
+![Registration](/public/readme/petition-registration.gif)
+
+![Adding Info](/public/readme/petition-moreInfo.gif)
 
 ### Signing the Petition
 
-![LogIn]()
+![Signing](/public/readme/petition-signature.gif)
 
 ### List of signers
 
-![LogIn]()
+![List of Signers](/public/readme/petitio-list-of-signers.gif)
 
 ### Updating User Profile
 
 ### Viewing List of Supporters (Total Count & by Location)
 
 ### Delete Account
-### Login
 
+### Login
 
 ![LogIn]()
