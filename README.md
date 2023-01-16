@@ -72,8 +72,14 @@ This particular petition advocates for more latin product in german supermarkets
 ### Resigning Petition
 ![Delete Signature](/public/readme/petition-adding-new-signature.gif)
 
+### Logout
+
+![LogOut](/public/readme/petition-logout.gif)
+
 ### Delete Account
+![DeleteAccount](/public/readme/petition-delete-account.gif)
+
 
 ### Login
 
-![LogIn]()
+![LogIn](/public/readme/petition-login.gif)
