@@ -32,20 +32,23 @@ This particular petition advocates for more latin product in german supermarkets
 
 ## Features
 
--   Registration and login.
--   Hashed passwords using bcrypt.
--   User can update their profile at any time saving the latest information in the database and rendering the updated information immediately.
--   Users are able to redo their signatures.
--   Users are able to sort list of supporters by city as well as access their provided url websites, if available, by clicking on any name.
--   Users are able to change their password.
--   Users are able to delete their accounts.
+- Registration and login.
+- Hashed passwords using bcrypt.
+- User can update their profile at any time saving the latest information in the database and rendering the updated information immediately.
+- Users are able to redo their signatures.
+- Users are able to sort list of supporters by city as well as access their provided url websites, if available, by clicking on any name.
+- Users are able to change their password.
+- Users are able to delete their accounts.
 
 ## Technologies
-[![My Skills](https://skillicons.dev/icons?i=js)](https://skillicons.dev) Javascript
 
-[![My Skills](https://skillicons.dev/icons?i=css)](https://skillicons.dev) CSS
+<a href="https://handlebarsjs.com/" target="_blank"> <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/handlebars/handlebars-original.svg" alt="handlebars" width="40" height="40"/> </a> [![My Skills](https://skillicons.dev/icons?i=js,nodejs,express,postgres,css)](https://skillicons.dev)
 
-<a href="https://handlebarsjs.com/" target="_blank"> <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/handlebars/handlebars-original.svg" alt="handlebars" width="40" height="40"/> </a> Handlebars
+- Handlebars
+- JavaScript
+- Node.js & Express
+- PostgreSQL
+- CSS
 
 ## Preview
 
@@ -64,12 +67,15 @@ This particular petition advocates for more latin product in german supermarkets
 ![List of Signers](/public/readme/petitio-list-of-signers.gif)
 
 ### Updating User Profile
+
 ![Updating user Profile](/public/readme/petition-updating-profile-info.gif)
 
 ### Delete Signature
+
 ![Delete Signature](/public/readme/petition-deleting-sgnature.gif)
 
 ### Resigning Petition
+
 ![Delete Signature](/public/readme/petition-adding-new-signature.gif)
 
 ### Logout
@@ -77,8 +83,8 @@ This particular petition advocates for more latin product in german supermarkets
 ![LogOut](/public/readme/petition-logout.gif)
 
 ### Delete Account
-![DeleteAccount](/public/readme/petition-delete-account.gif)
 
+![DeleteAccount](/public/readme/petition-delete-account.gif)
 
 ### Login
 
